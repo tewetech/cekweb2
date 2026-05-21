@@ -187,19 +187,6 @@
                 font-size: 0.75rem;
             }
         }
-
-        .gift-card {
-            background: #1a1a1a;
-            border: 1px solid #8b5e34;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            text-align: center;
-        }
-        @media (min-width: 768px) {
-            .gift-card {
-                padding: 2rem;
-            }
-        }
         
         .form-input {
             width: 100%;
@@ -298,7 +285,7 @@
         </div>
     </div>
 
-    <audio id="bgMusic" src="https://raw.githubusercontent.com/tewetech/wedding-invitation-tri-chusnul/refs/heads/main/Pernikahan%20Kita.mp3" loop=""></audio>
+    <audio id="bgMusic" src="https://raw.githubusercontent.com/tewetech/wedding-invitation-tri-chusnul/refs/heads/main/Pernikahan%20Kita.mp3" loop></audio>
 
     <main id="mainContent">
         <section id="home" class="hero-section min-h-[100dvh] flex flex-col items-center justify-center text-center px-4 relative">
@@ -356,9 +343,6 @@
         </section>
 
         <section id="event" class="py-16 md:py-20 px-4 bg-[#1a1a1a] relative w-full">
-            <div class="absolute top-0 left-0 opacity-10 pointer-events-none">
-            </div>
-
             <div class="max-w-5xl mx-auto border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/30 backdrop-blur-sm">
                 <div class="text-center mb-10 md:mb-12">
                     <h2 class="font-serif text-3xl md:text-4xl text-white italic" data-aos="zoom-in">Rangkaian Acara</h2>
@@ -371,7 +355,7 @@
                         <p class="mb-3 text-sm md:text-base"><i class="fas fa-calendar-days text-[#8b5e34] mr-2"></i> <span id="tglAkadTxt"></span></p>
                         <p class="mb-3 text-sm md:text-base"><i class="fas fa-clock text-[#8b5e34] mr-2"></i> <span id="jamAkadTxt"></span></p>
                         <p class="mb-6 text-gray-400 text-xs md:text-sm"><i class="fas fa-map-marker-alt text-[#8b5e34] mr-2"></i> <span id="alamatAkadTxt"></span></p>
-                        <a id="mapAkadLink" href="#" target="_blank" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm">
+                        <a id="mapAkadLink" href="" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm relative z-10 cursor-pointer">
                             <i class="fas fa-map-pin"></i> <span>Google Maps</span>
                         </a>
                     </div>
@@ -381,7 +365,7 @@
                         <p class="mb-3 text-sm md:text-base"><i class="fas fa-calendar-days text-[#8b5e34] mr-2"></i> <span id="tglResepsiTxt"></span></p>
                         <p class="mb-3 text-sm md:text-base"><i class="fas fa-clock text-[#8b5e34] mr-2"></i> <span id="jamResepsiTxt"></span></p>
                         <p class="mb-6 text-gray-400 text-xs md:text-sm"><i class="fas fa-map-marker-alt text-[#8b5e34] mr-2"></i> <span id="alamatResepsiTxt"></span></p>
-                        <a id="mapResepsiLink" href="#" target="_blank" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm">
+                        <a id="mapResepsiLink" href="" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm relative z-10 cursor-pointer">
                             <i class="fas fa-map-pin"></i> <span>Google Maps</span>
                         </a>
                     </div>
@@ -479,7 +463,6 @@
         const BARIS_DATA = 3;
         const ACTUAL_ROW = BARIS_DATA + 1;
         
-        let noHpTujuan = "";
         let targetCountdown = new Date().getTime();
         
         const door = document.getElementById('door');
@@ -490,21 +473,6 @@
         const musicIcon = document.getElementById('music-icon');
         const guestNameElement = document.getElementById('guestName');
         const elCountdown = document.getElementById('countdown');
-
-        function getBankLogo(bank) {
-            const logos = {
-                "Bank Rakyat Indonesia (BRI)": "https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg",
-                "Bank Negara Indonesia (BNI)": "https://upload.wikimedia.org/wikipedia/id/5/55/BNI_logo.svg",
-                "Bank Tabungan Negara (BTN)": "https://upload.wikimedia.org/wikipedia/commons/2/21/Bank_BTN_logo.svg",
-                "Bank Central Asia (BCA)": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg",
-                "Bank CIMB Niaga": "https://upload.wikimedia.org/wikipedia/commons/3/38/CIMB_Niaga_logo.svg",
-                "DANA": "https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg",
-                "OVO": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg",
-                "GoPay": "https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg",
-                "ShopeePay": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg"
-            };
-            return logos[bank] || "";
-        }
 
         async function fetchConfigData() {
             try {
@@ -524,6 +492,7 @@
                     document.getElementById('ortuPria').innerHTML = `${data.pria.putraKe} Putra Bpk. ${data.pria.ayah} & Ibu ${data.pria.ibu}`;
                     
                     const fD = d => {
+                        if(!d) return "";
                         const aH = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
                         const aB = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
                         const x = new Date(d.indexOf('T') === -1 ? d + 'T00:00:00' : d);
@@ -551,12 +520,18 @@
                     document.getElementById('tglAkadTxt').textContent = fD(data.akad.tanggal);
                     document.getElementById('jamAkadTxt').textContent = fT(data.akad.jam) + " WIB";
                     document.getElementById('alamatAkadTxt').textContent = data.akad.alamat;
-                    document.getElementById('mapAkadLink').href = data.akad.map;
+                    
+                    if(data.akad && data.akad.map) {
+                        document.getElementById('mapAkadLink').href = data.akad.map;
+                    }
                     
                     document.getElementById('tglResepsiTxt').textContent = fD(data.resepsi.tanggal);
                     document.getElementById('jamResepsiTxt').textContent = fT(data.resepsi.jam) + " WIB";
                     document.getElementById('alamatResepsiTxt').textContent = data.resepsi.alamat;
-                    document.getElementById('mapResepsiLink').href = data.resepsi.map;
+                    
+                    if(data.resepsi && data.resepsi.map) {
+                        document.getElementById('mapResepsiLink').href = data.resepsi.map;
+                    }
                     
                     document.getElementById('tglHeadline').textContent = fD(data.akad.tanggal);
                     document.getElementById('alamatHeadline').textContent = data.akad.alamat;
@@ -570,40 +545,8 @@
                             targetCountdown = parsedDate.getTime();
                         }
                     }
-                    
-                    if(data.kontak && data.kontak.wa) {
-                        noHpTujuan = data.kontak.wa;
-                    }
-                    
-                    const giftContainer = document.getElementById('giftContainer');
-                    if (giftContainer) {
-                        giftContainer.innerHTML = '';
-                        if(data.kado && data.kado.length > 0) {
-                            data.kado.forEach((k, i) => {
-                                let bName = k.bank;
-                                let lUrl = "";
-                                if(bName.indexOf("|") !== -1) {
-                                    let p = bName.split("|");
-                                    bName = p[0].trim();
-                                    lUrl = p[1].trim();
-                                } else {
-                                    lUrl = getBankLogo(bName);
-                                }
-                                const bDisp = lUrl ? `<img src="${lUrl}" alt="${bName}" style="height:40px;width:auto;margin:0 auto 1rem;object-fit:contain;background:white;padding:5px;border-radius:5px;">` : `<p class="font-bold text-white mb-2 text-xl">${bName}</p>`;
-                                giftContainer.innerHTML += `
-                                <div class="gift-card" data-aos="fade-up">
-                                    ${bDisp}
-                                    <p class="text-sm mt-2 text-gray-300">a.n. ${k.nama}</p>
-                                    <p class="text-xl font-bold text-white my-3 tracking-widest" id="rek-${i}">${k.nomor}</p>
-                                    <button type="button" class="copy-btn bg-[#d4a373] text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-white transition" data-target="#rek-${i}">Salin Nomor</button>
-                                </div>`;
-                            });
-                            attachCopyEvents();
-                        }
-                    }
                 }
-            } catch (err) {
-            } finally {
+            } catch (err) {} finally {
                 const loader = document.getElementById('loadingOverlay');
                 if (loader) {
                     loader.style.opacity = "0";
@@ -621,42 +564,6 @@
             } else {
                 guestNameElement.textContent = 'Tamu Istimewa Kami';
             }
-        }
-
-        function attachCopyEvents() {
-            document.querySelectorAll('.copy-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetSelector = button.getAttribute('data-target');
-                    const text = document.querySelector(targetSelector).innerText.trim();
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(text).then(() => {
-                            const orig = button.innerText;
-                            button.innerText = 'Tersalin!';
-                            setTimeout(() => { button.innerText = orig; }, 2000);
-                        }).catch(() => fallbackCopy(text, button));
-                    } else {
-                        fallbackCopy(text, button);
-                    }
-                });
-            });
-        }
-
-        function fallbackCopy(text, button) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed"; 
-            textArea.style.opacity = "0";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                if (document.execCommand('copy')) {
-                    const orig = button.innerText;
-                    button.innerText = 'Tersalin!';
-                    setTimeout(() => { button.innerText = orig; }, 2000);
-                }
-            } catch (err) {}
-            document.body.removeChild(textArea);
         }
 
         function tick(){
@@ -728,9 +635,6 @@
                     body: JSON.stringify({ nama, jumlah, kehadiran, pesan, type: 'rsvp', kode: KODE_UNDANGAN, row: ACTUAL_ROW })
                 });
             } catch (error) {}
-
-            const waNum = noHpTujuan || '6282323624177';
-            const text = `Assalamu'alaikum, saya ingin konfirmasi kehadiran.\nNama: ${nama}\nJumlah: ${jumlah}\nKehadiran: ${kehadiran}\nPesan: ${pesan}`;
             
             setTimeout(() => {
                 document.getElementById('rsvpForm').reset();
