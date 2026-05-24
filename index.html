@@ -285,7 +285,7 @@
         </div>
     </div>
 
-    <audio id="bgMusic" src="https://raw.githubusercontent.com/tewetech/wedding-invitation-tri-chusnul/refs/heads/main/Pernikahan%20Kita.mp3" loop></audio>
+    <audio id="bgMusic" src="https://raw.githubusercontent.com/tewetech/musik/refs/heads/main/Akad.mp3" loop></audio>
 
     <main id="mainContent">
         <section id="home" class="hero-section min-h-[100dvh] flex flex-col items-center justify-center text-center px-4 relative">
@@ -373,6 +373,24 @@
             </div>
         </section>
 
+        <section id="kado" class="py-16 md:py-20 px-4 bg-[#0f0f0f] w-full">
+            <div class="max-w-3xl mx-auto text-center border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/40 backdrop-blur-sm" data-aos="fade-up">
+                <h2 class="font-serif text-3xl md:text-4xl text-white italic mb-4">Kado Digital</h2>
+                <div class="h-1 w-20 md:w-24 bg-[#8b5e34] mx-auto mt-4 mb-8"></div>
+                <p class="text-xs md:text-sm text-gray-400 mb-8">Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Namun, jika Bapak/Ibu/Saudara/i ingin memberikan tanda kasih untuk kami, dapat melalui:</p>
+
+                <div class="bg-[#1a1a1a] border border-[#d4a373] rounded-xl p-6 max-w-sm mx-auto shadow-lg relative overflow-hidden">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/SeaBank.svg" alt="SeaBank" class="h-8 md:h-10 w-auto object-contain mx-auto mb-2">
+                    <p class="text-xl md:text-2xl font-mono text-[#d4a373] my-4" id="norek">901227380189</p>
+                    <p class="text-sm md:text-base text-gray-300 mb-6">ROSLIANA</p>
+                    <button onclick="copyRek()" id="copyBtn" class="bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-6 py-2 rounded-full transition duration-300 border border-[#d4a373] text-sm flex items-center justify-center mx-auto space-x-2">
+                        <i class="fas fa-copy"></i>
+                        <span>Salin Rekening</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <section id="rsvp" class="py-16 md:py-20 px-4 bg-[#1a1a1a] w-full">
             <div class="max-w-3xl mx-auto border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/40">
                 <div class="text-center mb-8" data-aos="fade-down">
@@ -440,6 +458,7 @@
         <div class="floating-buttons">
             <a href="#home"><i class="fas fa-home"></i></a>
             <a href="#event"><i class="fas fa-calendar-alt"></i></a>
+            <a href="#kado"><i class="fas fa-gift"></i></a>
             <a href="#rsvp"><i class="fas fa-envelope"></i></a>
             <button id="music-toggle-btn"><i class="fas fa-pause" id="music-icon"></i></button>
         </div>
@@ -614,6 +633,17 @@
         function escapeHtml(text) {
             if (!text) return "";
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function copyRek() {
+            navigator.clipboard.writeText("901227380189").then(() => {
+                const btn = document.getElementById('copyBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> <span>Tersalin!</span>';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
         }
 
         document.getElementById('rsvpForm').addEventListener('submit', async (e) => {
