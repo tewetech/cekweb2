@@ -3,266 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Undangan Pernikahan</title>
+    <title>The Wedding</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tewetech/favicon/refs/heads/main/wedding.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
     <style>
-        html, body {
-            width: 100%;
-            max-width: 100vw;
-            font-family: 'Poppins', sans-serif;
-            background-color: #1a1a1a;
-            color: #d4a373;
-            margin: 0;
-            padding: 0;
-        }
-        body.lock-scroll {
-            overflow: hidden;
-            height: 100dvh;
-        }
-        body.unlock-scroll {
-            overflow-x: hidden;
-            overflow-y: auto;
-            height: auto;
-        }
-        .font-serif {
-            font-family: 'Playfair Display', serif;
-        }
-        .font-vibes {
-            font-family: 'Great Vibes', cursive;
-        }
-        .bg-batik {
-            background-image: url('https://www.transparenttextures.com/patterns/batik-fabric.png');
-        }
-        
-        #loadingOverlay {
-            position: fixed;
-            inset: 0;
-            background-color: #0f0f0f;
-            background-image: url('https://www.transparenttextures.com/patterns/batik-fabric.png');
-            z-index: 999999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease;
-            width: 100vw;
-            height: 100dvh;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(212, 163, 115, 0.3);
-            border-top-color: #d4a373;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        html, body { width: 100%; max-width: 100vw; font-family: 'Poppins', sans-serif; background-color: #1a1a1a; color: #d4a373; margin: 0; padding: 0; }
+        body.lock-scroll { overflow: hidden; height: 100dvh; }
+        body.unlock-scroll { overflow-x: hidden; overflow-y: auto; height: auto; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .font-vibes { font-family: 'Great Vibes', cursive; }
+        .bg-batik { background-image: url('https://www.transparenttextures.com/patterns/batik-fabric.png'); }
+        #loadingOverlay { position: fixed; inset: 0; background-color: #0f0f0f; background-image: url('https://www.transparenttextures.com/patterns/batik-fabric.png'); z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; width: 100vw; height: 100dvh; }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(212, 163, 115, 0.3); border-top-color: #d4a373; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        .door-overlay {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1974&auto=format&fit=crop') center/cover no-repeat;
-            z-index: 9999;
-            transition: opacity 1s ease;
-            width: 100vw;
-            height: 100dvh;
-            overflow: hidden;
-        }
-        .door {
-            text-align: center;
-            border-radius: 1.5rem;
-            padding: 2rem 1.5rem;
-            max-width: 400px;
-            width: 90%;
-            max-height: 90dvh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,.5);
-            -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 163, 115, 0.4);
-            background: rgba(26, 26, 26, 0.6);
-            color: #d4a373;
-        }
-        .door span {
-            display: block;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.8s ease-out;
-        }
-        .door span.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .door-name {
-            font-family: 'Great Vibes', cursive;
-            font-size: 2.2rem;
-            display: block;
-            margin: 0.8rem 0;
-        }
-        @media (min-width: 768px) {
-            .door-name {
-                font-size: 2.8rem;
-            }
-        }
-        .guest-name {
-            font-family: 'Great Vibes', cursive;
-            font-size: 2rem;
-            margin: 0.8rem 0;
-            color: #fff;
-        }
-        @media (min-width: 768px) {
-            .guest-name {
-                font-size: 2.2rem;
-            }
-        }
-        
-        main {
-            display: none;
-            position: relative;
-            width: 100%;
-        }
-        .hero-section {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1974&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .countdown-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            text-align: center;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-        @media (min-width: 768px) {
-            .countdown-container {
-                gap: 15px;
-            }
-        }
-        .countdown-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 65px;
-            height: 65px;
-            background: rgba(139, 94, 52, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(212, 163, 115, 0.5);
-            backdrop-filter: blur(5px);
-        }
-        @media (min-width: 768px) {
-            .countdown-item {
-                width: 70px;
-                height: 70px;
-            }
-        }
-        .countdown-number {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #fff;
-        }
-        @media (min-width: 768px) {
-            .countdown-number {
-                font-size: 1.5rem;
-            }
-        }
-        .countdown-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-        }
-        @media (min-width: 768px) {
-            .countdown-label {
-                font-size: 0.75rem;
-            }
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border-radius: 0.5rem;
-            background: rgba(26, 26, 26, 0.8);
-            border: 1px solid #8b5e34;
-            color: #d4a373;
-            margin-bottom: 1rem;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: #d4a373;
-        }
-        
-        .guestbook-container {
-            max-height: 400px;
-            overflow-y: auto;
-            text-align: left;
-            margin-top: 2rem;
-            padding-right: 10px;
-        }
-        .guestbook-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .guestbook-container::-webkit-scrollbar-thumb {
-            background: #8b5e34;
-            border-radius: 10px;
-        }
-        .comment-item {
-            background: rgba(26, 26, 26, 0.8);
-            border: 1px solid #8b5e34;
-            border-radius: 12px;
-            padding: 12px 18px;
-            margin-bottom: 12px;
-        }
-        .comment-name {
-            font-weight: 600;
-            color: #fff;
-        }
-        .comment-badge {
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 12px;
-            background: #8b5e34;
-            color: #fff;
-            float: right;
-        }
-        
-        .floating-buttons {
-            position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 0.8rem;
-            z-index: 1000;
-        }
-        .floating-buttons a, .floating-buttons button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: rgba(15, 15, 15, 0.8);
-            border: 1px solid #8b5e34;
-            color: #d4a373;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        .floating-buttons a:hover, .floating-buttons button:hover {
-            background: #8b5e34;
-            color: #fff;
-        }
+        .door-overlay { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://plus.unsplash.com/premium_photo-1674235766088-80d8410f9523?auto=format&fit=crop&w=1974&q=80') center/cover no-repeat; z-index: 9999; transition: opacity 1s ease; width: 100vw; height: 100dvh; overflow: hidden; }
+        .door { text-align: center; border-radius: 1.5rem; padding: 2rem 1.5rem; max-width: 400px; width: 90%; max-height: 90dvh; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 8px 25px rgba(0,0,0,.5); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(212, 163, 115, 0.4); background: rgba(26, 26, 26, 0.6); color: #d4a373; }
+        .door span { display: block; opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
+        .door span.show { opacity: 1; transform: translateY(0); }
+        .door-name { font-family: 'Great Vibes', cursive; font-size: 2.2rem; display: block; margin: 0.8rem 0; }
+        @media (min-width: 768px) { .door-name { font-size: 2.8rem; } }
+        .guest-name { font-family: 'Great Vibes', cursive; font-size: 2rem; margin: 0.8rem 0; color: #fff; }
+        @media (min-width: 768px) { .guest-name { font-size: 2.2rem; } }
+        main { display: none; position: relative; width: 100%; }
+        .hero-section { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://plus.unsplash.com/premium_photo-1674235766088-80d8410f9523?auto=format&fit=crop&w=1974&q=80'); background-size: cover; background-position: center; }
+        .countdown-container { display: flex; justify-content: center; gap: 10px; text-align: center; margin-top: 1rem; flex-wrap: wrap; }
+        @media (min-width: 768px) { .countdown-container { gap: 15px; } }
+        .countdown-item { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 65px; height: 65px; background: rgba(139, 94, 52, 0.3); border-radius: 12px; border: 1px solid rgba(212, 163, 115, 0.5); backdrop-filter: blur(5px); }
+        @media (min-width: 768px) { .countdown-item { width: 70px; height: 70px; } }
+        .countdown-number { font-size: 1.2rem; font-weight: bold; color: #fff; }
+        @media (min-width: 768px) { .countdown-number { font-size: 1.5rem; } }
+        .countdown-label { font-size: 0.7rem; text-transform: uppercase; }
+        @media (min-width: 768px) { .countdown-label { font-size: 0.75rem; } }
+        .form-input { width: 100%; padding: 0.8rem 1rem; border-radius: 0.5rem; background: rgba(26, 26, 26, 0.8); border: 1px solid #8b5e34; color: #d4a373; margin-bottom: 1rem; }
+        .form-input:focus { outline: none; border-color: #d4a373; }
+        .guestbook-container { max-height: 400px; overflow-y: auto; text-align: left; margin-top: 2rem; padding-right: 10px; }
+        .guestbook-container::-webkit-scrollbar { width: 6px; }
+        .guestbook-container::-webkit-scrollbar-thumb { background: #8b5e34; border-radius: 10px; }
+        .comment-item { background: rgba(26, 26, 26, 0.8); border: 1px solid #8b5e34; border-radius: 12px; padding: 12px 18px; margin-bottom: 12px; }
+        .comment-name { font-weight: 600; color: #fff; }
+        .comment-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; background: #8b5e34; color: #fff; float: right; }
+        .floating-buttons { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.8rem; z-index: 1000; }
+        .floating-buttons a, .floating-buttons button { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; background: rgba(15, 15, 15, 0.8); border: 1px solid #8b5e34; color: #d4a373; cursor: pointer; text-decoration: none; transition: all 0.3s; }
+        .floating-buttons a:hover, .floating-buttons button:hover { background: #8b5e34; color: #fff; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-batik lock-scroll">
@@ -275,7 +62,11 @@
     <div class="door-overlay" id="door">
         <div class="door">
             <span class="uppercase tracking-widest text-sm text-gray-300">Undangan Pernikahan</span>
-            <span class="door-name" id="doorName">Nama & Nama</span>
+            <span class="door-name flex flex-col items-center">
+                <b id="doorNameWanita" class="font-normal font-vibes">Nama</b>
+                <b class="text-white text-2xl md:text-3xl my-1 font-serif font-normal">&</b>
+                <b id="doorNamePria" class="font-normal font-vibes">Nama</b>
+            </span>
             <span class="text-sm mt-4">Kepada Yth. Bapak/Ibu/Saudara/i:</span>
             <span id="guestName" class="guest-name"></span>
             <span class="text-xs italic text-gray-400 mb-6">* Mohon maaf apabila ada kesalahan penulisan nama/gelar</span>
@@ -285,7 +76,7 @@
         </div>
     </div>
 
-    <audio id="bgMusic" src="https://raw.githubusercontent.com/tewetech/musik/refs/heads/main/Akad.mp3" loop></audio>
+    <audio id="bgMusic" src="https://raw.githubusercontent.com/tewetech/wedding-invitation-tri-chusnul/refs/heads/main/Pernikahan%20Kita.mp3" loop></audio>
 
     <main id="mainContent">
         <section id="home" class="hero-section min-h-[100dvh] flex flex-col items-center justify-center text-center px-4 relative">
@@ -317,7 +108,8 @@
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="font-serif text-2xl md:text-3xl mb-4" data-aos="fade-down">Mempelai</h2>
                 <p class="text-xs md:text-base text-gray-400 mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed" data-aos="fade-up">
-                    “Ya Allah, dengan segala kesucian hati, kami bersujud memohon Ridho-Mu, untuk menuju Sunnah Rasul-Mu, membentuk keluarga yang senantiasa dalam limpahan Barokah, Sakinah, Mawaddah, War-Rahmah.”
+                    “ Di antara tanda-tanda (kebesaran)-Nya ialah bahwa Dia menciptakan pasangan-pasangan untukmu dari (jenis) dirimu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antarmu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir. ”<br><br>
+                    <strong>{ Q.S : Ar-Rum (30) : 21 }</strong>
                 </p>
                 
                 <div class="grid md:grid-cols-2 gap-10 md:gap-12 items-center">
@@ -355,7 +147,7 @@
                         <p class="mb-3 text-sm md:text-base"><i class="fas fa-calendar-days text-[#8b5e34] mr-2"></i> <span id="tglAkadTxt"></span></p>
                         <p class="mb-3 text-sm md:text-base"><i class="fas fa-clock text-[#8b5e34] mr-2"></i> <span id="jamAkadTxt"></span></p>
                         <p class="mb-6 text-gray-400 text-xs md:text-sm"><i class="fas fa-map-marker-alt text-[#8b5e34] mr-2"></i> <span id="alamatAkadTxt"></span></p>
-                        <a id="mapAkadLink" href="" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm relative z-10 cursor-pointer">
+                        <a id="mapAkadLink" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm relative z-10 cursor-pointer">
                             <i class="fas fa-map-pin"></i> <span>Google Maps</span>
                         </a>
                     </div>
@@ -365,7 +157,7 @@
                         <p class="mb-3 text-sm md:text-base"><i class="fas fa-calendar-days text-[#8b5e34] mr-2"></i> <span id="tglResepsiTxt"></span></p>
                         <p class="mb-3 text-sm md:text-base"><i class="fas fa-clock text-[#8b5e34] mr-2"></i> <span id="jamResepsiTxt"></span></p>
                         <p class="mb-6 text-gray-400 text-xs md:text-sm"><i class="fas fa-map-marker-alt text-[#8b5e34] mr-2"></i> <span id="alamatResepsiTxt"></span></p>
-                        <a id="mapResepsiLink" href="" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm relative z-10 cursor-pointer">
+                        <a id="mapResepsiLink" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm relative z-10 cursor-pointer">
                             <i class="fas fa-map-pin"></i> <span>Google Maps</span>
                         </a>
                     </div>
@@ -373,28 +165,29 @@
             </div>
         </section>
 
-        <section id="kado" class="py-16 md:py-20 px-4 bg-[#0f0f0f] w-full">
-            <div class="max-w-3xl mx-auto text-center border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/40 backdrop-blur-sm" data-aos="fade-up">
-                <h2 class="font-serif text-3xl md:text-4xl text-white italic mb-4">Kado Digital</h2>
-                <div class="h-1 w-20 md:w-24 bg-[#8b5e34] mx-auto mt-4 mb-8"></div>
-                <p class="text-xs md:text-sm text-gray-400 mb-8">Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Namun, jika Bapak/Ibu/Saudara/i ingin memberikan tanda kasih untuk kami, dapat melalui:</p>
-
-                <div class="bg-[#1a1a1a] border border-[#d4a373] rounded-xl p-6 max-w-sm mx-auto shadow-lg relative overflow-hidden">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/SeaBank.svg" alt="SeaBank" class="h-8 md:h-10 w-auto object-contain mx-auto mb-2">
-                    <p class="text-xl md:text-2xl font-mono text-[#d4a373] my-4" id="norek">901227380189</p>
-                    <p class="text-sm md:text-base text-gray-300 mb-6">ROSLIANA</p>
-                    <button onclick="copyRek()" id="copyBtn" class="bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-6 py-2 rounded-full transition duration-300 border border-[#d4a373] text-sm flex items-center justify-center mx-auto space-x-2">
-                        <i class="fas fa-copy"></i>
-                        <span>Salin Rekening</span>
-                    </button>
-                </div>
+        <section id="album" class="py-16 md:py-20 px-4 bg-[#0f0f0f] w-full hidden">
+            <div class="max-w-5xl mx-auto text-center" data-aos="fade-up">
+                <h2 class="font-serif text-3xl md:text-4xl text-white italic mb-4">Galeri Momen</h2>
+                <div class="h-1 w-20 md:w-24 bg-[#8b5e34] mx-auto mt-4 mb-10"></div>
+                <div id="albumContainer" class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar"></div>
             </div>
         </section>
 
-        <section id="rsvp" class="py-16 md:py-20 px-4 bg-[#1a1a1a] w-full">
+        <section id="gift" class="py-16 md:py-20 px-4 bg-[#1a1a1a] w-full">
+            <div class="max-w-3xl mx-auto text-center border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/40 backdrop-blur-sm" data-aos="fade-up">
+                <h2 class="font-serif text-3xl md:text-4xl text-white italic mb-4">Wedding Gift</h2>
+                <div class="h-1 w-20 md:w-24 bg-[#8b5e34] mx-auto mt-4 mb-8"></div>
+                <p class="text-xs md:text-sm text-gray-400 mb-8">Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Apabila memberi adalah ungkapan tanda kasih Anda, maka Anda dapat memberikan kado secara nontunai.</p>
+                
+                <div id="giftContainer"></div>
+            </div>
+        </section>
+
+        <section id="rsvp" class="py-16 md:py-20 px-4 bg-[#0f0f0f] w-full">
             <div class="max-w-3xl mx-auto border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/40">
                 <div class="text-center mb-8" data-aos="fade-down">
-                    <h2 class="font-serif text-2xl md:text-3xl text-white">Ucapan & Doa</h2>
+                    <h2 class="font-serif text-2xl md:text-3xl text-white">Konfirmasi Kehadiran</h2>
+                    <p class="text-xs md:text-sm text-gray-400 mt-2">Mohon konfirmasi kehadiran Anda melalui form berikut.</p>
                 </div>
                 
                 <form id="rsvpForm" data-aos="fade-up">
@@ -424,12 +217,12 @@
                         <textarea id="pesan" rows="4" class="form-input text-sm" required></textarea>
                     </div>
                     <button type="submit" id="btnSubmit" class="w-full bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-8 py-3 md:py-4 rounded-full transition duration-300 font-bold border border-[#d4a373] text-sm md:text-base">
-                         Kirim
+                         Kirim & Lanjut WA
                     </button>
                 </form>
 
                 <div class="mt-12 md:mt-16" data-aos="fade-up">
-                    <h3 class="font-serif text-xl md:text-2xl text-center mb-6 text-white border-t border-[#8b5e34] pt-8">Buku Tamu</h3>
+                    <h3 class="font-serif text-xl md:text-2xl text-center mb-6 text-white border-t border-[#8b5e34] pt-8">Ucapan & Doa</h3>
                     <div id="guestbook" class="guestbook-container">
                         <div class="text-center py-4 text-sm text-gray-400">Memuat ucapan...</div>
                     </div>
@@ -439,12 +232,12 @@
 
         <footer class="py-12 md:py-16 bg-black text-center px-4 pb-28 w-full">
             <div data-aos="fade-up">
-                <p class="italic text-gray-400 mb-6 max-w-lg mx-auto text-xs md:text-sm">“Dan orang-orang yang beriman, lelaki dan perempuan, sebahagian mereka (adalah) menjadi penolong bagi sebahagian yang lain. Mereka menyuruh (mengerjakan) yang ma’ruf, mencegah dari yang munkar, mendirikan shalat, menunaikan zakat dan mereka taat pada Allah dan Rasul-Nya. Mereka itu akan diberi rahmat oleh Allah; sesungguhnya Allah Maha Perkasa lagi Maha Bijaksana.”</p>
-                <h2 class="font-vibes text-3xl md:text-4xl mb-8 text-white">Qs. At-Taubah (9): 71</h2>
                 <div class="flex justify-center space-x-4 mb-6">
-                    <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦔ</div>
-                    <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦧ</div>
-                    <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦫ</div>
+                <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦠ</div>
+                <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦌ</div>
+                <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦮ</div>
+                <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦌ</div>
+
                 </div>
                 <p class="text-[10px] md:text-xs text-gray-600">
                     <a href="https://wa.me/6282323624177" target="_blank" rel="noopener noreferrer" class="hover:text-[#d4a373] transition-colors duration-300 decoration-transparent outline-none">
@@ -458,7 +251,7 @@
         <div class="floating-buttons">
             <a href="#home"><i class="fas fa-home"></i></a>
             <a href="#event"><i class="fas fa-calendar-alt"></i></a>
-            <a href="#kado"><i class="fas fa-gift"></i></a>
+            <a href="#gift"><i class="fas fa-gift"></i></a>
             <a href="#rsvp"><i class="fas fa-envelope"></i></a>
             <button id="music-toggle-btn"><i class="fas fa-pause" id="music-icon"></i></button>
         </div>
@@ -469,132 +262,210 @@
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <h3 class="text-xl md:text-2xl font-serif text-white mb-2">Terima Kasih</h3>
-                <p class="text-xs md:text-sm text-gray-300 mb-6">Doa dan ucapan Anda telah berhasil dikirim. Data buku tamu telah diperbarui.</p>
+                <p class="text-xs md:text-sm text-gray-300 mb-6">Doa dan ucapan Anda telah berhasil dikirim.</p>
                 <button type="button" id="closePopupBtn" class="bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-8 py-2 rounded-full transition duration-300 border border-[#d4a373] text-sm">Tutup</button>
             </div>
+        </div>
+
+        <div id="lightboxModal" class="fixed inset-0 z-[999999] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm" onclick="this.classList.add('hidden')">
+            <img id="lightboxImg" src="" class="max-w-[90%] max-h-[90dvh] object-contain rounded-lg border border-[#8b5e34]">
+            <button class="absolute top-4 right-4 text-white text-4xl">&times;</button>
         </div>
     </main>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbzfXANEGt9exxCNjJoH1uFor2Mil2a5OZ8azDmqA79jlY2VeJ99xwJkxh-WSGOaHN9G/exec";
-        const KODE_UNDANGAN = "U1";
-        const BARIS_DATA = 3;
-        const ACTUAL_ROW = BARIS_DATA + 1;
-        
-        let targetCountdown = new Date().getTime();
-        
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwoHua2FfrPAKJ_85jsodWxUftwbLHXW95XQ0ryCDkmMOYOkdbDjrt4uVVS2wby3kwz/exec";
+        const Sheet = "Undangan";
+        const Baris = 3;
+        const HP_Customer = "085707311468";
+
         const door = document.getElementById('door');
         const openBtn = document.getElementById('openBtn');
         const bgMusic = document.getElementById('bgMusic');
-        const main = document.getElementById('mainContent');
+        const main = document.querySelector('main');
         const musicToggleBtn = document.getElementById('music-toggle-btn');
         const musicIcon = document.getElementById('music-icon');
         const guestNameElement = document.getElementById('guestName');
-        const elCountdown = document.getElementById('countdown');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        let isMusicPlaying = false;
+        let targetTime = 0;
+        let waTujuan = "";
 
-        async function fetchConfigData() {
+        async function init() {
+            getGuestName();
+            await fetchData();
+            loadingOverlay.style.opacity = "0";
+            setTimeout(() => {
+                loadingOverlay.style.display = "none";
+                door.style.display = "flex";
+                setTimeout(() => {
+                    document.querySelectorAll('.door span').forEach(span => span.classList.add('show'));
+                }, 100);
+            }, 500);
+            setInterval(tick, 1000);
+            loadGuestbookMessages();
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+
+        function fixUrl(u) {
+            if(!u) return "";
+            const m = u.match(/\/d\/(.+?)\//) || u.match(/id=(.+?)(&|$)/);
+            return m ? `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600` : u;
+        }
+
+        function getBankLogo(bank) {
+            const logos = {
+                "Bank Rakyat Indonesia (BRI)": "https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg",
+                "Bank Mandiri": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg",
+                "Bank Negara Indonesia (BNI)": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Bank_Negara_Indonesia_logo_%282004%29.svg",
+                "Bank Syariah Indonesia (BSI)": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Bank_Syariah_Indonesia.svg",
+                "Bank Tabungan Negara (BTN)": "https://upload.wikimedia.org/wikipedia/commons/c/ca/BTN_2024.svg",
+                "Bank Central Asia (BCA)": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg",
+                "Bank CIMB Niaga": "https://upload.wikimedia.org/wikipedia/commons/3/38/CIMB_Niaga_logo.svg",
+                "Bank Permata": "https://upload.wikimedia.org/wikipedia/id/4/48/PermataBank_logo.svg",
+                "Bank Danamon": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Danamon.svg",
+                "Bank Mega": "https://upload.wikimedia.org/wikipedia/commons/a/af/Bank_Mega_2013.svg",
+                "SeaBank": "https://upload.wikimedia.org/wikipedia/commons/a/ac/SeaBank.svg",
+                "DANA": "https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg",
+                "OVO": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg",
+                "GoPay": "https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg",
+                "ShopeePay": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg",
+                "LinkAja": "https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg"
+            };
+            return logos[bank] || "";
+        }
+
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightboxModal').classList.remove('hidden');
+        }
+
+        async function fetchData() {
             try {
-                const response = await fetch(URL_GOOGLE_SCRIPT + "?action=getData&kode=" + KODE_UNDANGAN + "&row=" + ACTUAL_ROW);
-                const data = await response.json();
-                
-                if(data && data.wanita) {
-                    document.title = "The Wedding of " + data.wanita.namaPanggilan + " & " + data.pria.namaPanggilan;
-
-                    document.getElementById('doorName').textContent = data.wanita.namaPanggilan + ' & ' + data.pria.namaPanggilan;
-                    document.getElementById('heroWanita').textContent = data.wanita.namaPanggilan;
-                    document.getElementById('heroPria').textContent = data.pria.namaPanggilan;
-                    document.getElementById('namaWanita').textContent = data.wanita.namaLengkap;
-                    document.getElementById('namaPria').textContent = data.pria.namaLengkap;
+                const res = await fetch(`${GAS_URL}?action=getData&kode=${Sheet}&phone=${HP_Customer}&row=${Baris}`);
+                const d = await res.json();
+                if (d.status === "success") {
+                    const nW = d.wanita.namaPanggilan;
+                    const nP = d.pria.namaPanggilan;
+                    waTujuan = d.kontak.wa;
+                    document.title = `The Wedding of ${nW} & ${nP}`;
+                    document.getElementById('doorNameWanita').textContent = nW;
+                    document.getElementById('doorNamePria').textContent = nP;
+                    document.getElementById('heroWanita').textContent = nW;
+                    document.getElementById('heroPria').textContent = nP;
+                    document.getElementById('namaWanita').textContent = d.wanita.namaLengkap;
+                    document.getElementById('ortuWanita').innerHTML = `Putri Ke ${d.wanita.putriKe} dari Bpk. ${d.wanita.ayah} & Ibu ${d.wanita.ibu}`;
+                    document.getElementById('fotoWanita').src = fixUrl(d.media.fotoWanita);
+                    document.getElementById('namaPria').textContent = d.pria.namaLengkap;
+                    document.getElementById('ortuPria').innerHTML = `Putra Ke ${d.pria.putraKe} dari Bpk. ${d.pria.ayah} & Ibu ${d.pria.ibu}`;
+                    document.getElementById('fotoPria').src = fixUrl(d.media.fotoPria);
                     
-                    document.getElementById('ortuWanita').innerHTML = `${data.wanita.putriKe} Putri Bpk. ${data.wanita.ayah} & Ibu ${data.wanita.ibu}`;
-                    document.getElementById('ortuPria').innerHTML = `${data.pria.putraKe} Putra Bpk. ${data.pria.ayah} & Ibu ${data.pria.ibu}`;
-                    
-                    const fD = d => {
-                        if(!d) return "";
-                        const aH = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-                        const aB = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-                        const x = new Date(d.indexOf('T') === -1 ? d + 'T00:00:00' : d);
-                        return isNaN(x) ? d : aH[x.getDay()] + ", " + x.getDate() + " " + aB[x.getMonth()] + " " + x.getFullYear();
+                    const fd = t => {
+                        const x = new Date(t);
+                        return x.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                     };
-                    const fT = t => {
-                        if(!t) return "";
-                        if(t.indexOf('T') !== -1) {
-                            const d = new Date(t);
-                            return d.getHours().toString().padStart(2,'0') + ":" + d.getMinutes().toString().padStart(2,'0');
-                        }
-                        const p = t.split(':');
-                        if(p.length >= 2) return p[0].padStart(2,'0') + ":" + p[1].padStart(2,'0');
-                        return t;
-                    };
-                    const fixU = u => {
-                        if(!u) return "";
-                        const m = u.match(/\/d\/(.+?)\//);
-                        return m ? "https://drive.google.com/thumbnail?id=" + m[1] + "&sz=w400" : u;
-                    };
-
-                    if(data.media && data.media.fotoWanita) document.getElementById('fotoWanita').src = fixU(data.media.fotoWanita);
-                    if(data.media && data.media.fotoPria) document.getElementById('fotoPria').src = fixU(data.media.fotoPria);
+                    document.getElementById('tglHeadline').textContent = fd(d.akad.tanggal);
+                    document.getElementById('alamatHeadline').textContent = d.akad.alamat;
+                    document.getElementById('tglAkadTxt').textContent = fd(d.akad.tanggal);
+                    document.getElementById('jamAkadTxt').textContent = `${d.akad.jam} WIB`;
+                    document.getElementById('alamatAkadTxt').textContent = d.akad.alamat;
+                    document.getElementById('mapAkadLink').href = d.akad.map;
+                    document.getElementById('tglResepsiTxt').textContent = fd(d.resepsi.tanggal);
+                    document.getElementById('jamResepsiTxt').textContent = `${d.resepsi.jam} WIB`;
+                    document.getElementById('alamatResepsiTxt').textContent = d.resepsi.alamat;
+                    document.getElementById('mapResepsiLink').href = d.resepsi.map;
                     
-                    document.getElementById('tglAkadTxt').textContent = fD(data.akad.tanggal);
-                    document.getElementById('jamAkadTxt').textContent = fT(data.akad.jam) + " WIB";
-                    document.getElementById('alamatAkadTxt').textContent = data.akad.alamat;
+                    targetTime = new Date(`${d.akad.tanggal} ${d.akad.jam}`).getTime();
                     
-                    if(data.akad && data.akad.map) {
-                        document.getElementById('mapAkadLink').href = data.akad.map;
-                    }
-                    
-                    document.getElementById('tglResepsiTxt').textContent = fD(data.resepsi.tanggal);
-                    document.getElementById('jamResepsiTxt').textContent = fT(data.resepsi.jam) + " WIB";
-                    document.getElementById('alamatResepsiTxt').textContent = data.resepsi.alamat;
-                    
-                    if(data.resepsi && data.resepsi.map) {
-                        document.getElementById('mapResepsiLink').href = data.resepsi.map;
-                    }
-                    
-                    document.getElementById('tglHeadline').textContent = fD(data.akad.tanggal);
-                    document.getElementById('alamatHeadline').textContent = data.akad.alamat;
-                    document.getElementById('footerNames').textContent = data.wanita.namaPanggilan + ' & ' + data.pria.namaPanggilan;
-                    
-                    if(data.akad.tanggal && data.akad.jam) {
-                        let safeDate = data.akad.tanggal.indexOf('T') !== -1 ? data.akad.tanggal.split('T')[0].replace(/-/g,'/') : data.akad.tanggal.replace(/-/g,'/');
-                        let jamStr = fT(data.akad.jam);
-                        let parsedDate = new Date(`${safeDate} ${jamStr}`);
-                        if(!isNaN(parsedDate)) {
-                            targetCountdown = parsedDate.getTime();
+                    if (d.media && d.media.album) {
+                        const albumUrls = d.media.album.split('\n').filter(url => url.trim() !== '');
+                        if (albumUrls.length > 0) {
+                            document.getElementById('album').classList.remove('hidden');
+                            const albumWrap = document.getElementById('albumContainer');
+                            albumWrap.innerHTML = '';
+                            let delayAlbum = 0;
+                            albumUrls.forEach(u => {
+                                const imgUrl = fixUrl(u);
+                                albumWrap.innerHTML += `<img src="${imgUrl}" class="flex-none w-32 h-32 md:w-48 md:h-48 object-cover rounded-lg border border-[#8b5e34] shadow-lg snap-center cursor-pointer" alt="Gallery" data-aos="fade-in" data-aos-delay="${delayAlbum}" onclick="openLightbox('${imgUrl}')">`;
+                                delayAlbum += 100;
+                            });
                         }
                     }
+
+                    const giftWrap = document.getElementById('giftContainer');
+                    giftWrap.innerHTML = '';
+                    d.kado.forEach((k, idx) => {
+                        const logoUrl = getBankLogo(k.bank);
+                        const logoDisplay = logoUrl ? `<img src="${logoUrl}" alt="${k.bank}" class="h-10 mb-4 mx-auto object-contain bg-white px-3 py-2 rounded">` : `<p class="text-2xl font-serif text-[#d4a373] mb-2">${k.bank}</p>`;
+                        giftWrap.innerHTML += `
+                        <div class="bg-[#1a1a1a] border border-[#d4a373] rounded-xl p-6 max-w-sm mx-auto shadow-lg relative overflow-hidden mb-6">
+                            ${logoDisplay}
+                            <p class="text-xl md:text-2xl font-mono text-[#d4a373] my-4" id="account-${idx}">${k.nomor}</p>
+                            <p class="text-sm md:text-base text-gray-300 mb-6">${k.nama}</p>
+                            <button onclick="salinTeks('${k.nomor}', this)" class="bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-6 py-2 rounded-full transition duration-300 border border-[#d4a373] text-sm flex items-center justify-center mx-auto space-x-2">
+                                <i class="fas fa-copy"></i>
+                                <span>Salin Rekening</span>
+                            </button>
+                        </div>`;
+                    });
+                    document.getElementById('footerNames').innerHTML = `<strong>• ${nW} & ${nP} •</strong>`;
                 }
-            } catch (err) {} finally {
-                const loader = document.getElementById('loadingOverlay');
-                if (loader) {
-                    loader.style.opacity = "0";
-                    setTimeout(() => loader.style.display = "none", 500);
-                }
-            }
+            } catch (e) {}
         }
 
         function getGuestName() {
             const urlParams = new URLSearchParams(window.location.search);
             const name = urlParams.get('to');
             if (name) {
-                guestNameElement.textContent = decodeURIComponent(name.replace(/\+/g, ' '));
-                document.getElementById('nama').value = decodeURIComponent(name.replace(/\+/g, ' '));
+                const decName = decodeURIComponent(name.replace(/\+/g, ' '));
+                guestNameElement.textContent = decName;
+                document.getElementById('nama').value = decName;
             } else {
-                guestNameElement.textContent = 'Tamu Istimewa Kami';
+                guestNameElement.textContent = 'Tamu Undangan';
             }
         }
 
+        openBtn.addEventListener('click', () => {
+            const playPromise = bgMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => { isMusicPlaying = true; }).catch(e => {
+                    isMusicPlaying = false;
+                    musicIcon.classList.remove('fa-pause');
+                    musicIcon.classList.add('fa-play');
+                });
+            }
+            door.style.opacity = "0";
+            setTimeout(() => door.style.display = "none", 1000);
+            main.style.display = "block";
+            document.body.classList.replace('lock-scroll', 'unlock-scroll');
+            AOS.init({ once: true, duration: 1000, offset: 50 });
+        });
+
+        musicToggleBtn.addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play();
+                musicIcon.className = 'fas fa-pause';
+            } else {
+                bgMusic.pause();
+                musicIcon.className = 'fas fa-play';
+            }
+        });
+
         function tick(){
-            const dist = targetCountdown - Date.now();
+            if(targetTime === 0) return;
+            const elCountdown = document.getElementById('countdown');
+            const now = Date.now();
+            const dist = targetTime - now;
             if(dist <= 0 || isNaN(dist)){
-                elCountdown.innerHTML = `<p class="text-white text-sm md:text-base">Acara sedang berlangsung / selesai.</p>`;
+                elCountdown.innerHTML = `<p class="text-white text-sm md:text-base">Acara sedang berlangsung / telah selesai.</p>`;
                 return;
             }
-            const d = Math.floor(dist / (1000 * 60 * 60 * 24));
-            const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((dist % (1000 * 60)) / 1000);
+            const d = Math.floor(dist/(1000*60*60*24));
+            const h = Math.floor((dist%(1000*60*60*24))/(1000*60*60));
+            const m = Math.floor((dist%(1000*60*60))/(1000*60));
+            const s = Math.floor((dist%(1000*60))/1000);
             elCountdown.innerHTML = `
                 <div class="countdown-item"><span class="countdown-number">${d}</span><span class="countdown-label text-[#d4a373]">Hari</span></div>
                 <div class="countdown-item"><span class="countdown-number">${h}</span><span class="countdown-label text-[#d4a373]">Jam</span></div>
@@ -603,10 +474,39 @@
             `;
         }
 
+        function salinTeks(text, btnElement) {
+            const originalHTML = btnElement.innerHTML;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    btnElement.innerHTML = '<i class="fas fa-check"></i> <span>Tersalin!</span>';
+                    setTimeout(() => { btnElement.innerHTML = originalHTML; }, 2000);
+                }).catch(() => fallbackCopy(text, btnElement, originalHTML));
+            } else {
+                fallbackCopy(text, btnElement, originalHTML);
+            }
+        }
+
+        function fallbackCopy(text, btnElement, originalHTML) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; 
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                if (document.execCommand('copy')) {
+                    btnElement.innerHTML = '<i class="fas fa-check"></i> <span>Tersalin!</span>';
+                    setTimeout(() => { btnElement.innerHTML = originalHTML; }, 2000);
+                }
+            } catch (err) {}
+            document.body.removeChild(textArea);
+        }
+
         async function loadGuestbookMessages() {
             const container = document.getElementById('guestbook');
             try {
-                const response = await fetch(URL_GOOGLE_SCRIPT + "?action=getMessages&kode=" + KODE_UNDANGAN + "&row=" + ACTUAL_ROW);
+                const response = await fetch(`${GAS_URL}?action=getMessages&kode=${Sheet}&row=${Baris}`);
                 const data = await response.json();
                 container.innerHTML = '';
                 if (data.length === 0) {
@@ -635,17 +535,6 @@
             return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
-        function copyRek() {
-            navigator.clipboard.writeText("901227380189").then(() => {
-                const btn = document.getElementById('copyBtn');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> <span>Tersalin!</span>';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                }, 2000);
-            });
-        }
-
         document.getElementById('rsvpForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btnSubmit = document.getElementById('btnSubmit');
@@ -653,67 +542,45 @@
             btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
             btnSubmit.disabled = true;
 
-            const nama = document.getElementById('nama').value;
-            const jumlah = document.getElementById('jumlah').value;
-            const kehadiran = document.getElementById('kehadiran').value;
-            const pesan = document.getElementById('pesan').value;
+            const payload = {
+                type: 'rsvp', 
+                kode: Sheet, 
+                row: Baris,
+                nama: document.getElementById('nama').value,
+                jumlah: document.getElementById('jumlah').value,
+                kehadiran: document.getElementById('kehadiran').value,
+                pesan: document.getElementById('pesan').value
+            };
 
             try {
-                await fetch(URL_GOOGLE_SCRIPT, {
+                await fetch(GAS_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify({ nama, jumlah, kehadiran, pesan, type: 'rsvp', kode: KODE_UNDANGAN, row: ACTUAL_ROW })
+                    body: JSON.stringify(payload)
                 });
             } catch (error) {}
+
+            let waNum = waTujuan;
+            if(waNum.startsWith('0')) waNum = '62' + waNum.substring(1);
             
+            const text = `Assalamu'alaikum, saya konfirmasi kehadiran undangan.\n\n*Nama:* ${payload.nama}\n*Jumlah:* ${payload.jumlah} Orang\n*Kehadiran:* ${payload.kehadiran}\n*Pesan:* ${payload.pesan}`;
+            const waLink = `https://wa.me/${waNum}?text=${encodeURIComponent(text)}`;
+            window.open(waLink, '_blank');
+
             setTimeout(() => {
                 document.getElementById('rsvpForm').reset();
                 getGuestName(); 
                 btnSubmit.innerHTML = originalText;
                 btnSubmit.disabled = false;
-                loadGuestbookMessages();
+                loadGuestbookMessages(); 
                 document.getElementById('popupModal').classList.remove('hidden');
-            }, 500);
+            }, 1000);
         });
 
         document.getElementById('closePopupBtn').addEventListener('click', () => {
             document.getElementById('popupModal').classList.add('hidden');
         });
-
-        openBtn.addEventListener('click', () => {
-            const playPromise = bgMusic.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(e => {
-                    musicIcon.classList.replace('fa-pause', 'fa-play');
-                });
-            }
-            door.style.opacity = "0";
-            setTimeout(() => door.style.display = "none", 1000);
-            main.style.display = "block";
-            
-            document.body.classList.replace('lock-scroll', 'unlock-scroll');
-            
-            AOS.init({ once: true, duration: 1000, offset: 50 });
-            
-            setTimeout(() => {
-                document.querySelectorAll('.door span').forEach(span => span.classList.add('show'));
-                loadGuestbookMessages();
-            }, 100);
-        });
-
-        musicToggleBtn.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                bgMusic.play();
-                musicIcon.classList.replace('fa-play', 'fa-pause');
-            } else {
-                bgMusic.pause();
-                musicIcon.classList.replace('fa-pause', 'fa-play');
-            }
-        });
         
-        bgMusic.addEventListener('play', () => { musicIcon.classList.replace('fa-play', 'fa-pause'); });
-        bgMusic.addEventListener('pause', () => { musicIcon.classList.replace('fa-pause', 'fa-play'); });
-
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -722,15 +589,7 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('year').textContent = new Date().getFullYear();
-            getGuestName();
-            setTimeout(() => {
-                document.querySelectorAll('.door span').forEach(span => span.classList.add('show'));
-            }, 500);
-            fetchConfigData();
-            setInterval(tick, 1000);
-        });
+        init();
     </script>
 </body>
 </html>
