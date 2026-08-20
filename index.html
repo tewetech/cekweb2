@@ -1,595 +1,3643 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Wedding</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tewetech/favicon/refs/heads/main/wedding.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        html, body { width: 100%; max-width: 100vw; font-family: 'Poppins', sans-serif; background-color: #1a1a1a; color: #d4a373; margin: 0; padding: 0; }
-        body.lock-scroll { overflow: hidden; height: 100dvh; }
-        body.unlock-scroll { overflow-x: hidden; overflow-y: auto; height: auto; }
-        .font-serif { font-family: 'Playfair Display', serif; }
-        .font-vibes { font-family: 'Great Vibes', cursive; }
-        .bg-batik { background-image: url('https://www.transparenttextures.com/patterns/batik-fabric.png'); }
-        #loadingOverlay { position: fixed; inset: 0; background-color: #0f0f0f; background-image: url('https://www.transparenttextures.com/patterns/batik-fabric.png'); z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; width: 100vw; height: 100dvh; }
-        .spinner { width: 50px; height: 50px; border: 5px solid rgba(212, 163, 115, 0.3); border-top-color: #d4a373; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .door-overlay { position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://plus.unsplash.com/premium_photo-1674235766088-80d8410f9523?auto=format&fit=crop&w=1974&q=80') center/cover no-repeat; z-index: 9999; transition: opacity 1s ease; width: 100vw; height: 100dvh; overflow: hidden; }
-        .door { text-align: center; border-radius: 1.5rem; padding: 2rem 1.5rem; max-width: 400px; width: 90%; max-height: 90dvh; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 8px 25px rgba(0,0,0,.5); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid rgba(212, 163, 115, 0.4); background: rgba(26, 26, 26, 0.6); color: #d4a373; }
-        .door span { display: block; opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
-        .door span.show { opacity: 1; transform: translateY(0); }
-        .door-name { font-family: 'Great Vibes', cursive; font-size: 2.2rem; display: block; margin: 0.8rem 0; }
-        @media (min-width: 768px) { .door-name { font-size: 2.8rem; } }
-        .guest-name { font-family: 'Great Vibes', cursive; font-size: 2rem; margin: 0.8rem 0; color: #fff; }
-        @media (min-width: 768px) { .guest-name { font-size: 2.2rem; } }
-        main { display: none; position: relative; width: 100%; }
-        .hero-section { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://plus.unsplash.com/premium_photo-1674235766088-80d8410f9523?auto=format&fit=crop&w=1974&q=80'); background-size: cover; background-position: center; }
-        .countdown-container { display: flex; justify-content: center; gap: 10px; text-align: center; margin-top: 1rem; flex-wrap: wrap; }
-        @media (min-width: 768px) { .countdown-container { gap: 15px; } }
-        .countdown-item { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 65px; height: 65px; background: rgba(139, 94, 52, 0.3); border-radius: 12px; border: 1px solid rgba(212, 163, 115, 0.5); backdrop-filter: blur(5px); }
-        @media (min-width: 768px) { .countdown-item { width: 70px; height: 70px; } }
-        .countdown-number { font-size: 1.2rem; font-weight: bold; color: #fff; }
-        @media (min-width: 768px) { .countdown-number { font-size: 1.5rem; } }
-        .countdown-label { font-size: 0.7rem; text-transform: uppercase; }
-        @media (min-width: 768px) { .countdown-label { font-size: 0.75rem; } }
-        .form-input { width: 100%; padding: 0.8rem 1rem; border-radius: 0.5rem; background: rgba(26, 26, 26, 0.8); border: 1px solid #8b5e34; color: #d4a373; margin-bottom: 1rem; }
-        .form-input:focus { outline: none; border-color: #d4a373; }
-        .guestbook-container { max-height: 400px; overflow-y: auto; text-align: left; margin-top: 2rem; padding-right: 10px; }
-        .guestbook-container::-webkit-scrollbar { width: 6px; }
-        .guestbook-container::-webkit-scrollbar-thumb { background: #8b5e34; border-radius: 10px; }
-        .comment-item { background: rgba(26, 26, 26, 0.8); border: 1px solid #8b5e34; border-radius: 12px; padding: 12px 18px; margin-bottom: 12px; }
-        .comment-name { font-weight: 600; color: #fff; }
-        .comment-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; background: #8b5e34; color: #fff; float: right; }
-        .floating-buttons { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.8rem; z-index: 1000; }
-        .floating-buttons a, .floating-buttons button { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; background: rgba(15, 15, 15, 0.8); border: 1px solid #8b5e34; color: #d4a373; cursor: pointer; text-decoration: none; transition: all 0.3s; }
-        .floating-buttons a:hover, .floating-buttons button:hover { background: #8b5e34; color: #fff; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lelayu | Tewe Tech</title>
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/tewetech/aset/main/Full%20Aset%20(Final)/Ikon/graveyard_icon_184537.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary:#0f766e;
+    --primary-dark:#115e59;
+    --primary-light:#ccfbf1;
+    --surface:#ffffff;
+    --background:#f5f7f9;
+    --border:#e5e7eb;
+    --text:#1f2937;
+    --muted:#6b7280;
+}
+
+* {
+    box-sizing:border-box;
+    scrollbar-width:none;
+}
+
+*::-webkit-scrollbar {
+    width:0!important;
+    height:0!important;
+    display:none!important;
+}
+
+html,
+body {
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    scrollbar-width:none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width:0!important;
+    height:0!important;
+    display:none!important;
+}
+
+body {
+    font-family:'Plus Jakarta Sans','Inter',sans-serif;
+    background:var(--background);
+    color:var(--text);
+    overflow:hidden;
+}
+
+#lang-modal,
+#custom-popup,
+#finish-popup,
+#donation-popup,
+#mobile-preview-modal {
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.72);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    z-index:10000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+#donation-popup {
+    z-index:12000;
+}
+
+.lang-card,
+.popup-card {
+    width:min(440px,100%);
+    max-height:90vh;
+    overflow:auto;
+    scrollbar-width:none;
+    background:rgba(255,255,255,.98);
+    padding:28px;
+    border-radius:24px;
+    text-align:center;
+    box-shadow:0 24px 60px rgba(15,23,42,.25);
+    border:1px solid rgba(255,255,255,.8);
+    animation:popupIn .28s ease;
+}
+
+.lang-card::-webkit-scrollbar,
+.popup-card::-webkit-scrollbar,
+.finish-summary::-webkit-scrollbar,
+.form-area::-webkit-scrollbar,
+#preview-container::-webkit-scrollbar {
+    width:0!important;
+    height:0!important;
+    display:none!important;
+}
+
+@keyframes popupIn {
+    from {
+        opacity:0;
+        transform:translateY(18px) scale(.96);
+    }
+    to {
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+.lang-card h2,
+.popup-card h2 {
+    color:#111827;
+    font-size:21px;
+    font-weight:800;
+    margin:0 0 8px;
+}
+
+.lang-card::after {
+    content:'Silakan pilih bahasa untuk mulai membuat pengumuman lelayu';
+    display:block;
+    width:260px;
+    margin:14px auto 30px;
+    color:#6b7280;
+    font-size:12px;
+    line-height:1.6;
+}
+
+.lang-card .flex {
+    gap:10px;
+}
+
+.lang-card button {
+    flex:1;
+    padding:12px 16px!important;
+    border-radius:12px!important;
+    font-size:13px;
+    font-weight:700;
+    transition:all .2s ease;
+    border:0;
+}
+
+.lang-card button:first-child {
+    background:var(--primary)!important;
+    color:white;
+}
+
+.lang-card button:first-child:hover {
+    background:var(--primary-dark)!important;
+}
+
+.lang-card button:last-child {
+    background:#f0fdfa!important;
+    color:#0f766e!important;
+    border:1px solid #99f6e4!important;
+}
+
+.lang-card button:last-child:hover {
+    background:#ccfbf1!important;
+}
+
+.popup-icon {
+    width:56px;
+    height:56px;
+    margin:0 auto 12px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#ecfdf5;
+    color:#059669;
+    font-size:28px;
+    animation:iconPop .4s ease;
+}
+
+@keyframes iconPop {
+    0% {
+        transform:scale(.5) rotate(-10deg);
+        opacity:0;
+    }
+    70% {
+        transform:scale(1.08);
+    }
+    100% {
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+.popup-message {
+    color:#64748b;
+    font-size:13px;
+    line-height:1.7;
+    margin:8px 0 20px;
+}
+
+.popup-button {
+    width:100%;
+    border:0;
+    border-radius:12px;
+    padding:11px 16px;
+    background:#0f766e;
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+.popup-button:hover {
+    background:#115e59;
+    transform:translateY(-1px);
+}
+
+.popup-button.secondary {
+    background:#f1f5f9;
+    color:#475569;
+    border:1px solid #e2e8f0;
+}
+
+.popup-button.secondary:hover {
+    background:#e2e8f0;
+}
+
+.popup-button.download-png {
+    background:#0f766e;
+}
+
+.popup-button.download-png:hover {
+    background:#115e59;
+}
+
+.popup-button.download-pdf {
+    background:#dc2626;
+}
+
+.popup-button.download-pdf:hover {
+    background:#b91c1c;
+}
+
+.popup-button.donation {
+    background:#e11d48;
+}
+
+.popup-button.donation:hover {
+    background:#be123c;
+}
+
+.popup-actions {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:18px;
+}
+
+.popup-actions .popup-button {
+    flex:1;
+}
+
+.popup-actions .popup-button.full-width {
+    grid-column:1 / -1;
+}
+
+.finish-summary {
+    text-align:left;
+    margin-top:18px;
+    padding:14px;
+    border:1px solid #e2e8f0;
+    border-radius:15px;
+    background:#f8fafc;
+    max-height:330px;
+    overflow:auto;
+    scrollbar-width:none;
+}
+
+.summary-section {
+    margin-bottom:13px;
+}
+
+.summary-section:last-child {
+    margin-bottom:0;
+}
+
+.summary-title {
+    font-size:12px;
+    font-weight:800;
+    color:#0f766e;
+    margin-bottom:5px;
+}
+
+.summary-item {
+    display:grid;
+    grid-template-columns:100px 10px 1fr;
+    gap:3px;
+    font-size:11px;
+    color:#475569;
+    line-height:1.65;
+}
+
+.example-text {
+    color:#dc2626!important;
+}
+
+.donation-card {
+    width:min(390px,100%);
+    max-height:90vh;
+    overflow:auto;
+    scrollbar-width:none;
+    background:#fff;
+    padding:26px;
+    border-radius:24px;
+    text-align:center;
+    box-shadow:0 24px 60px rgba(15,23,42,.28);
+    animation:popupIn .28s ease;
+}
+
+.donation-card::-webkit-scrollbar {
+    width:0!important;
+    height:0!important;
+    display:none!important;
+}
+
+.donation-icon {
+    width:58px;
+    height:58px;
+    margin:0 auto 12px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff1f2;
+    color:#e11d48;
+    font-size:27px;
+    animation:iconPop .4s ease;
+}
+
+.donation-title {
+    margin:0;
+    color:#111827;
+    font-size:21px;
+    font-weight:800;
+}
+
+.donation-message {
+    margin:8px auto 18px;
+    max-width:300px;
+    color:#64748b;
+    font-size:12px;
+    line-height:1.7;
+}
+
+.donation-qr {
+    width:190px;
+    height:190px;
+    object-fit:contain;
+    display:block;
+    margin:0 auto 17px;
+    padding:8px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+}
+
+.donation-label {
+    font-size:11px;
+    color:#64748b;
+    margin-bottom:14px;
+}
+
+.donation-close {
+    width:100%;
+    border:0;
+    border-radius:12px;
+    padding:11px 16px;
+    background:#0f766e;
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+.donation-close:hover {
+    background:#115e59;
+    transform:translateY(-1px);
+}
+
+#mobile-preview-modal {
+    display:none;
+    z-index:11000;
+    padding:10px;
+}
+
+.mobile-preview-card {
+    width:100%;
+    height:100%;
+    max-width:100%;
+    background:#eef2f5;
+    border-radius:20px;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 20px 60px rgba(15,23,42,.3);
+}
+
+.mobile-preview-header {
+    position:absolute;
+    top:10px;
+    left:10px;
+    right:10px;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 10px;
+    border-radius:13px;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    box-shadow:0 8px 25px rgba(15,23,42,.12);
+}
+
+.mobile-preview-title {
+    font-size:12px;
+    font-weight:800;
+    color:#334155;
+}
+
+.mobile-preview-close {
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    border:1px solid #e2e8f0;
+    background:#f8fafc;
+    color:#475569;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.mobile-preview-content {
+    width:100%;
+    height:100%;
+}
+
+#preview-container {
+    width:100%;
+    height:100%;
+    display:block;
+    overflow:auto;
+    scrollbar-width:none;
+    position:relative;
+    background:
+        radial-gradient(circle at 20% 20%,rgba(20,184,166,.06),transparent 28%),
+        radial-gradient(circle at 80% 80%,rgba(14,116,144,.05),transparent 28%),
+        #eef2f5;
+    cursor:grab;
+}
+
+#preview-container:active {
+    cursor:grabbing;
+}
+
+#preview-stage {
+    position:relative;
+    min-width:100%;
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+}
+
+#paper-wrapper {
+    position:relative;
+    flex-shrink:0;
+    box-shadow:
+        0 25px 60px rgba(15,23,42,.14),
+        0 5px 15px rgba(15,23,42,.08);
+    background:white;
+    border-radius:2px;
+    overflow:hidden;
+}
+
+#paper {
+    width:794px;
+    height:1123px;
+    min-width:794px;
+    min-height:1123px;
+    max-width:794px;
+    max-height:1123px;
+    background-image:url('https://raw.githubusercontent.com/tewetech/aset/main/Full%20Aset%20(Final)/Gambar/Frame%20Lelayu.png');
+    background-size:100% 100%;
+    background-position:center;
+    background-repeat:no-repeat;
+    position:absolute;
+    top:0;
+    left:0;
+    transform-origin:top left;
+    display:flex;
+    flex-direction:column;
+    padding:58px 58px;
+    color:black;
+}
+
+#content-area {
+    width:100%;
+    height:100%;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    padding-bottom:36px;
+}
+
+#sidebar {
+    min-height:0;
+    overflow:hidden;
+    background:#fff;
+}
+
+.step-container {
+    display:none;
+    flex:1;
+    min-height:0;
+    height:auto;
+    overflow:hidden;
+}
+
+.step-container.active {
+    display:flex;
+    flex-direction:column;
+}
+
+.form-area {
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:20px;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+}
+
+.form-area::-webkit-scrollbar {
+    display:none;
+    width:0;
+    height:0;
+}
+
+.step-title-card {
+    position:sticky;
+    top:-20px;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    margin:-20px -20px 18px;
+    padding:13px 16px;
+    background:#0f766e;
+    color:#fff;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:13px;
+    line-height:1.2;
+    font-weight:800;
+    letter-spacing:.3px;
+    box-shadow:0 4px 12px rgba(15,118,110,.15);
+}
+
+.bottom-nav {
+    flex-shrink:0;
+    padding:14px 20px;
+    border-top:1px solid #edf0f2;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#fff;
+    position:relative;
+    z-index:30;
+}
+
+.text-dyn {
+    font-size:20px;
+    line-height:1.3;
+}
+
+.text-title {
+    font-size:52px;
+    line-height:1;
+    font-weight:800;
+    text-align:center;
+    letter-spacing:.5px;
+}
+
+.text-354 {
+    position:absolute;
+    right:7px;
+    top:18px;
+    font-size:34px;
+    line-height:1;
+    font-weight:800;
+}
+
+.text-arabic {
+    font-family:'Times New Roman','Noto Naskh Arabic',serif;
+    font-size:36px;
+    line-height:1.35;
+    text-align:center;
+    margin-top:7px;
+    margin-bottom:9px;
+}
+
+.text-name {
+    font-size:43px;
+    line-height:1.1;
+    font-weight:800;
+    text-align:center;
+    margin:7px 0;
+}
+
+.grid-info {
+    display:grid;
+    grid-template-columns:132px 9px 1fr;
+    gap:3px;
+    margin:7px auto;
+    width:83.333333%;
+    font-size:18px;
+    line-height:1.28;
+}
+
+.text-justified {
+    text-align:justify;
+    margin:7px 0;
+    line-height:1.35;
+}
+
+#txt-intro1 {
+    font-size:20px;
+    line-height:1.25;
+}
+
+#txt-intro2 {
+    font-size:21px;
+    line-height:1.25;
+}
+
+#txt-intro3 {
+    font-size:19px;
+    line-height:1.3;
+}
+
+#txt-age-prefix,
+#out-umur,
+#txt-age-suffix {
+    font-size:19px;
+}
+
+#age-section {
+    width:83.333333%;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+    font-weight:700;
+}
+
+#txt-age-prefix,
+#txt-age-suffix {
+    font-weight:700;
+}
+
+#txt-burial-title,
+#txt-closing1 {
+    font-size:19px;
+    line-height:1.3;
+}
+
+#txt-burial-title {
+    width:83.333333%;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+    font-weight:800;
+}
+
+#txt-outro {
+    font-size:18px;
+}
+
+#sec-keluarga {
+    width:83.333333%;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.keluarga-title {
+    font-size:19px;
+    line-height:1.25;
+    font-weight:800;
+    font-style:normal;
+    margin-bottom:6px;
+    margin-top:18px;
+}
+
+.keluarga-list {
+    width:100%;
+    text-align:left;
+}
+
+.keluarga-heading {
+    font-size:18px;
+    line-height:1.25;
+    font-weight:800;
+    margin:0 0 2px;
+}
+
+#out-pasangan,
+#out-anak,
+#out-cucu {
+    font-size:18px;
+    line-height:1.28;
+}
+
+#sec-keluarga {
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:6px;
+}
+
+#txt-condolence {
+    width:100%;
+    order:1;
+}
+
+#sec-pasangan {
+    order:2;
+}
+
+#sec-anak {
+    order:3;
+}
+
+#sec-cucu {
+    order:4;
+}
+
+#dyn-wrapper {
+    flex:1;
+    min-height:0;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+#dyn-content {
+    width:100%;
+    flex:0 0 auto;
+    font-size:20px!important;
+    line-height:1.3;
+}
+
+#dyn-content > div {
+    box-sizing:border-box;
+}
+
+.preview-auto-scale {
+    transition:font-size .05s linear;
+}
+
+.floating-controls {
+    position:fixed;
+    right:18px;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:9999;
+    display:flex;
+    align-items:center;
+}
+
+.floating-card {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:7px;
+    padding:9px;
+    border-radius:18px;
+    background:rgba(255,255,255,.94);
+    border:1px solid rgba(226,232,240,.95);
+    box-shadow:0 12px 35px rgba(15,23,42,.14);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+}
+
+.icon-btn {
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    background:transparent;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    border:1px solid transparent;
+    transition:all .2s ease;
+}
+
+.icon-btn:hover {
+    background:#f0fdfa;
+    border-color:#99f6e4;
+    transform:translateY(-1px);
+}
+
+.icon-btn:active {
+    transform:translateY(0);
+}
+
+.icon-btn svg {
+    width:20px;
+    height:20px;
+}
+
+.icon-btn:hover svg {
+    color:#0f766e;
+}
+
+.png-icon {
+    color:#0f766e;
+}
+
+.pdf-icon {
+    color:#dc2626;
+}
+
+.donation-icon-btn {
+    color:#e11d48;
+}
+
+.donation-icon-btn:hover {
+    background:#fff1f2;
+    border-color:#fecdd3;
+}
+
+.donation-icon-btn:hover i {
+    color:#e11d48;
+}
+
+.control-divider {
+    width:26px;
+    height:1px;
+    background:#e2e8f0;
+    margin:1px 0;
+}
+
+.preview-zoom-btn {
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    border:1px solid transparent;
+    background:transparent;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:21px;
+    font-weight:700;
+    color:#475569;
+    user-select:none;
+    transition:all .2s ease;
+}
+
+.preview-zoom-btn:hover {
+    background:#f0fdfa;
+    border-color:#99f6e4;
+    color:#0f766e;
+    transform:translateY(-1px);
+}
+
+.preview-zoom-value {
+    min-width:42px;
+    height:28px;
+    padding:0 6px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Inter',sans-serif;
+    font-size:10px;
+    font-weight:700;
+    color:#64748b;
+}
+
+.sidebar-header {
+    padding:13px 20px 10px;
+    background:linear-gradient(135deg,#0f766e,#0d9488);
+    color:#fff;
+    font-weight:800;
+    font-size:17px;
+    text-align:center;
+    flex-shrink:0;
+    position:relative;
+    overflow:hidden;
+}
+
+.sidebar-header::after {
+    content:'';
+    position:absolute;
+    width:100px;
+    height:100px;
+    right:-35px;
+    top:-45px;
+    border-radius:50%;
+    background:rgba(255,255,255,.1);
+}
+
+.sidebar-whatsapp {
+    display:block;
+    position:relative;
+    z-index:2;
+    margin-top:3px;
+    color:rgba(255,255,255,.9);
+    font-family:'Inter',sans-serif;
+    font-size:10px;
+    line-height:1.2;
+    font-weight:500;
+    text-decoration:none;
+    transition:opacity .2s ease;
+}
+
+.sidebar-whatsapp:hover {
+    opacity:.75;
+}
+
+.step-indicator {
+    flex-shrink:0;
+    padding:12px 20px;
+    border-bottom:1px solid #edf0f2;
+    background:#fbfcfd;
+}
+
+.step-track {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+}
+
+.step-item {
+    display:flex;
+    align-items:center;
+    flex:1;
+}
+
+.step-item:last-child {
+    flex:0 auto;
+}
+
+.step-circle {
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#0f766e;
+    background:#f0fdfa;
+    border:2px solid #0f766e;
+    font-size:15px;
+    font-weight:800;
+    transition:all .3s ease;
+    position:relative;
+    z-index:2;
+}
+
+.step-line {
+    height:3px;
+    flex:1;
+    background:#cbd5e1;
+    transition:all .35s ease;
+}
+
+.step-item.active .step-circle {
+    color:#fff;
+    background:#0f766e;
+    border-color:#0f766e;
+    transform:scale(1.12);
+    box-shadow:0 0 0 5px rgba(15,118,110,.1);
+    animation:stepPulse 1.5s infinite;
+}
+
+.step-item.done .step-circle {
+    color:#fff;
+    background:#0f766e;
+    border-color:#0f766e;
+    transform:scale(.96);
+}
+
+.step-item.done + .step-line {
+    background:#0f766e;
+}
+
+@keyframes stepPulse {
+    0%,100% {
+        box-shadow:0 0 0 4px rgba(15,118,110,.08);
+    }
+    50% {
+        box-shadow:0 0 0 8px rgba(15,118,110,.02);
+    }
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #dbe1e7;
+    border-radius:10px;
+    background:#fbfcfd;
+    color:#1f2937;
+    font-family:'Inter',sans-serif;
+    font-size:12px!important;
+    line-height:1.4;
+    margin-top:5px;
+    outline:none;
+    transition:all .2s ease;
+}
+
+#in-makam-dari {
+    display:block;
+    width:100%;
+    min-height:58px;
+    padding:10px 12px;
+    margin-top:5px;
+    font-family:'Inter',sans-serif;
+    font-size:12px!important;
+    line-height:1.4;
+    text-align:left;
+    text-indent:0;
+    vertical-align:top;
+}
+
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="date"]:hover,
+input[type="time"]:hover,
+textarea:hover,
+select:hover {
+    border-color:#cbd5e1;
+    background:#fff;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+textarea:focus,
+select:focus {
+    border-color:#5eead4;
+    background:#fff;
+    box-shadow:0 0 0 3px rgba(20,184,166,.1);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color:#94a3b8;
+    opacity:1;
+}
+
+input[type="date"],
+input[type="time"] {
+    cursor:pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor:pointer;
+    opacity:.75;
+}
+
+input[readonly] {
+    cursor:default;
+    background:#f8fafc;
+}
+
+textarea {
+    resize:vertical;
+}
+
+label {
+    font-family:'Inter',sans-serif;
+    font-size:12px!important;
+    font-weight:600;
+    color:#475569;
+}
+
+.checkbox-wrap {
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin-bottom:10px;
+    font-family:'Inter',sans-serif;
+    font-size:12px!important;
+}
+
+.checkbox-wrap input[type="checkbox"] {
+    width:16px;
+    height:16px;
+    accent-color:#0f766e;
+    cursor:pointer;
+}
+
+.checkbox-wrap label {
+    cursor:pointer;
+    font-size:12px!important;
+}
+
+.radio-group {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:7px;
+}
+
+.radio-option {
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:9px 11px;
+    border:1px solid #dbe1e7;
+    border-radius:10px;
+    background:#fbfcfd;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+.radio-option:hover {
+    border-color:#99f6e4;
+    background:#f0fdfa;
+}
+
+.radio-option input[type="radio"] {
+    width:16px;
+    height:16px;
+    margin:0;
+    accent-color:#0f766e;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.radio-option span {
+    font-family:'Inter',sans-serif;
+    font-size:12px;
+    font-weight:600;
+    color:#475569;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+    border-color:#5eead4;
+    background:#f0fdfa;
+}
+
+.radio-option:has(input[type="radio"]:checked) span {
+    color:#0f766e;
+}
+
+.form-area h3 {
+    color:#334155!important;
+    font-family:'Plus Jakarta Sans',sans-serif!important;
+    font-size:13px!important;
+    margin-bottom:14px!important;
+}
+
+.form-area > div {
+    margin-bottom:13px;
+}
+
+.form-area .p-2 {
+    padding:13px!important;
+    border:1px solid #e5e7eb!important;
+    border-radius:13px!important;
+    background:#f8fafc!important;
+    transition:border-color .2s ease,background .2s ease;
+}
+
+.form-area .p-2:hover {
+    border-color:#d5e5e4!important;
+    background:#f9fbfb!important;
+}
+
+.btn-nav {
+    padding:10px 17px;
+    min-width:88px;
+    min-height:40px;
+    border-radius:10px;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .2s ease;
+    border:0;
+}
+
+.btn-prev {
+    background:#f1f5f9;
+    color:#475569;
+    border:1px solid #e2e8f0;
+}
+
+.btn-prev:hover {
+    background:#e2e8f0;
+}
+
+.btn-next {
+    background:#0f766e;
+    color:#fff;
+    box-shadow:0 4px 12px rgba(15,118,110,.18);
+}
+
+.btn-next:hover {
+    background:#115e59;
+    transform:translateY(-1px);
+}
+
+.children-list {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.child-row {
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.child-row input {
+    margin-top:0!important;
+    flex:1;
+    min-width:0;
+}
+
+.child-btn {
+    flex-shrink:0;
+    width:34px;
+    height:34px;
+    border-radius:9px;
+    border:1px solid #dbe1e7;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Inter',sans-serif;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+.child-add {
+    background:#f0fdfa;
+    color:#0f766e;
+    border-color:#99f6e4;
+}
+
+.child-add:hover {
+    background:#ccfbf1;
+}
+
+.child-remove {
+    background:#fff7f7;
+    color:#dc2626;
+    border-color:#fecaca;
+}
+
+.child-remove:hover {
+    background:#fee2e2;
+}
+
+.children-note {
+    font-family:'Inter',sans-serif;
+    font-size:11px;
+    color:#94a3b8;
+    margin-top:7px;
+}
+
+#sec-keluarga {
+    width:83.333333%;
+    text-align:left;
+}
+
+#out-anak,
+#out-cucu {
+    white-space:pre-line;
+    text-align:left;
+    width:100%;
+}
+
+@media(max-width:767px) {
+    html,
+    body {
+        width:100%;
+        height:100%;
+        min-height:100dvh;
+    }
+
+    body {
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+    }
+
+    #sidebar {
+        width:100%;
+        height:100dvh;
+        min-height:100dvh;
+        max-height:100dvh;
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+        border-right:0;
+    }
+
+    #preview-container {
+        display:none!important;
+    }
+
+    .floating-controls {
+        display:none;
+    }
+
+    .sidebar-header {
+        flex-shrink:0;
+        padding:12px 18px 9px;
+        font-size:17px;
+        text-align:center;
+    }
+
+    .sidebar-whatsapp {
+        font-size:9px;
+    }
+
+    .step-indicator {
+        flex-shrink:0;
+        padding:10px 18px;
+    }
+
+    .step-circle {
+        width:31px;
+        height:31px;
+        font-size:14px;
+    }
+
+    .step-container {
+        flex:1 1 0;
+        min-height:0;
+        height:auto;
+        overflow:hidden;
+    }
+
+    .step-container.active {
+        display:flex;
+        flex-direction:column;
+        min-height:0;
+    }
+
+    .form-area {
+        flex:1 1 auto;
+        min-height:0;
+        overflow-y:auto;
+        padding:18px;
+        padding-bottom:24px;
+    }
+
+    .step-title-card {
+        top:-18px;
+        margin:-18px -18px 18px;
+        padding:12px 14px;
+        font-size:12px;
+    }
+
+    .bottom-nav {
+        flex:0 0 auto;
+        min-height:64px;
+        height:64px;
+        padding:11px 18px;
+        border-top:1px solid #e5e7eb;
+        background:#fff;
+        display:flex!important;
+        align-items:center;
+        justify-content:space-between;
+        position:sticky;
+        bottom:0;
+        z-index:100;
+        box-shadow:0 -6px 18px rgba(15,23,42,.06);
+    }
+
+    .btn-nav {
+        display:flex!important;
+        align-items:center;
+        justify-content:center;
+        visibility:visible!important;
+        opacity:1!important;
+        min-width:96px;
+        min-height:42px;
+        padding:10px 16px;
+    }
+
+    .mobile-preview-card #preview-container {
+        display:block!important;
+        width:100%;
+        height:100%;
+    }
+
+    .mobile-preview-card .floating-controls {
+        display:flex;
+        left:50%;
+        right:auto;
+        top:auto;
+        bottom:14px;
+        transform:translateX(-50%);
+        width:auto;
+        justify-content:center;
+    }
+
+    .mobile-preview-card .floating-card {
+        flex-direction:row;
+        gap:5px;
+        padding:7px;
+        border-radius:16px;
+    }
+
+    .mobile-preview-card .icon-btn,
+    .mobile-preview-card .preview-zoom-btn {
+        width:38px;
+        height:38px;
+        border-radius:11px;
+    }
+
+    .mobile-preview-card .icon-btn svg {
+        width:18px;
+        height:18px;
+    }
+
+    .mobile-preview-card .icon-btn i {
+        font-size:17px;
+    }
+
+    .mobile-preview-card .preview-zoom-btn {
+        font-size:19px;
+    }
+
+    .mobile-preview-card .preview-zoom-value {
+        min-width:38px;
+        height:26px;
+    }
+
+    .mobile-preview-card .control-divider {
+        width:1px;
+        height:22px;
+        margin:0 2px;
+    }
+
+    .text-arabic {
+        font-size:36px;
+    }
+
+    #in-makam-dari {
+        padding:10px 12px;
+        text-align:left;
+        text-indent:0;
+        line-height:1.4;
+    }
+
+    .popup-card {
+        padding:22px;
+    }
+
+    .popup-actions {
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(min-width:768px) {
+    #mobile-preview-modal {
+        display:none!important;
+    }
+}
+
+@media print {
+    body * {
+        visibility:hidden;
+    }
+
+    #paper-wrapper,
+    #paper-wrapper * {
+        visibility:visible;
+    }
+
+    #paper-wrapper {
+        position:absolute;
+        left:0;
+        top:0;
+        box-shadow:none;
+    }
+
+    #paper {
+        transform:scale(1)!important;
+        padding:55px;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+    }
+
+    @page {
+        size:A4;
+        margin:0;
+    }
+}
+</style>
 </head>
-<body class="bg-batik lock-scroll">
 
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
-        <p class="mt-4">Memuat Undangan...</p>
+<body class="flex flex-col md:flex-row h-screen w-screen overflow-hidden">
+
+<div id="lang-modal">
+    <div class="lang-card">
+        <h2>GUNAKAN BAHASA</h2>
+        <div class="flex gap-4 justify-center">
+            <button onclick="setLanguage('id')">Indonesia</button>
+            <button onclick="setLanguage('jv')">Jawa</button>
+        </div>
     </div>
+</div>
 
-    <div class="door-overlay" id="door">
-        <div class="door">
-            <span class="uppercase tracking-widest text-sm text-gray-300">Undangan Pernikahan</span>
-            <span class="door-name flex flex-col items-center">
-                <b id="doorNameWanita" class="font-normal font-vibes">Nama</b>
-                <b class="text-white text-2xl md:text-3xl my-1 font-serif font-normal">&</b>
-                <b id="doorNamePria" class="font-normal font-vibes">Nama</b>
-            </span>
-            <span class="text-sm mt-4">Kepada Yth. Bapak/Ibu/Saudara/i:</span>
-            <span id="guestName" class="guest-name"></span>
-            <span class="text-xs italic text-gray-400 mb-6">* Mohon maaf apabila ada kesalahan penulisan nama/gelar</span>
-            <button id="openBtn" class="bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-8 py-3 rounded-full transition duration-300 border border-[#d4a373] text-sm md:text-base mt-2 mx-auto">
-                <i class="fas fa-envelope-open me-2"></i> Buka Undangan
+<div id="custom-popup" style="display:none;">
+    <div class="popup-card">
+        <div class="popup-icon">!</div>
+        <h2 id="popup-title">Data Belum Lengkap</h2>
+        <div id="popup-message" class="popup-message"></div>
+        <button class="popup-button" onclick="closePopup()">Mengerti</button>
+    </div>
+</div>
+
+<div id="finish-popup" style="display:none;">
+    <div class="popup-card">
+        <div class="popup-icon">✓</div>
+        <h2>Data Selesai</h2>
+        <div class="popup-message">Data yang Anda masukkan sudah berhasil diproses.</div>
+        <div id="finish-summary" class="finish-summary"></div>
+
+        <div class="popup-actions">
+            <button class="popup-button secondary" onclick="closeFinishPopup()">Tutup</button>
+            <button class="popup-button" onclick="finishAndShowPreview()">Lihat Preview</button>
+
+            <button class="popup-button download-png" onclick="downloadPNG()">
+                <i class="fa-solid fa-image mr-1"></i> Unduh PNG
+            </button>
+
+            <button class="popup-button download-pdf" onclick="downloadPDF()">
+                <i class="fa-solid fa-file-pdf mr-1"></i> Unduh PDF
+            </button>
+
+            <button class="popup-button donation full-width" onclick="showDonationPopup()">
+                <i class="fa-solid fa-heart mr-1"></i> Donasi
             </button>
         </div>
     </div>
+</div>
 
-    <audio id="bgMusic" src="https://raw.githubusercontent.com/tewetech/wedding-invitation-tri-chusnul/refs/heads/main/Pernikahan%20Kita.mp3" loop></audio>
-
-    <main id="mainContent">
-        <section id="home" class="hero-section min-h-[100dvh] flex flex-col items-center justify-center text-center px-4 relative">
-            <div data-aos="fade-up" data-aos-duration="2000" class="w-full max-w-2xl">
-                <div class="mb-6 flex justify-center">
-                    <svg width="60" height="60" class="md:w-[80px] md:h-[80px]" viewBox="0 0 24 24" fill="none" stroke="#d4a373" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L7 7H17L12 2Z" />
-                        <path d="M12 22V7" />
-                        <path d="M5 13C5 13 7 10 12 10C17 10 19 13 19 13" />
-                        <circle cx="12" cy="5" r="1" />
-                    </svg>
-                </div>
-                <p class="uppercase tracking-widest text-xs md:text-sm mb-4 text-gray-300">The Wedding of</p>
-                <h1 class="font-vibes text-5xl md:text-8xl mb-6 text-white leading-tight flex flex-col items-center gap-2 md:gap-4">
-                    <span id="heroWanita">Nama</span>
-                    <span class="font-serif text-[#d4a373] text-3xl md:text-6xl">&</span>
-                    <span id="heroPria">Nama</span>
-                </h1>
-                
-                <div class="border border-[#8b5e34] bg-black/40 backdrop-blur-sm p-4 md:p-6 rounded-2xl mt-8 mx-2 md:mx-0">
-                    <p id="tglHeadline" class="text-base md:text-lg font-bold text-white mb-4"></p>
-                    <div id="countdown" class="countdown-container mb-4"></div>
-                    <p id="alamatHeadline" class="text-xs md:text-sm mt-4 px-2"></p>
-                </div>
-            </div>
-        </section>
-
-        <section id="content" class="py-16 md:py-20 px-4 bg-[#0f0f0f] w-full">
-            <div class="max-w-4xl mx-auto text-center">
-                <h2 class="font-serif text-2xl md:text-3xl mb-4" data-aos="fade-down">Mempelai</h2>
-                <p class="text-xs md:text-base text-gray-400 mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed" data-aos="fade-up">
-                    “ Di antara tanda-tanda (kebesaran)-Nya ialah bahwa Dia menciptakan pasangan-pasangan untukmu dari (jenis) dirimu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antarmu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir. ”<br><br>
-                    <strong>{ Q.S : Ar-Rum (30) : 21 }</strong>
-                </p>
-                
-                <div class="grid md:grid-cols-2 gap-10 md:gap-12 items-center">
-                    <div data-aos="fade-right">
-                        <div class="relative inline-block">
-                            <img id="fotoWanita" src="" alt="Wanita" class="rounded-t-full border-4 border-[#8b5e34] w-52 h-64 md:w-64 md:h-80 object-cover mx-auto bg-gray-800">
-                            <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-[#8b5e34] text-black px-4 py-1 font-bold text-sm md:text-base">Wanita</div>
-                        </div>
-                        <h3 id="namaWanita" class="font-vibes text-3xl md:text-4xl mt-8 text-white">Nama Lengkap</h3>
-                        <p id="ortuWanita" class="text-xs md:text-sm mt-2 text-gray-400 px-4"></p>
-                    </div>
-
-                    <div data-aos="fade-left">
-                        <div class="relative inline-block">
-                            <img id="fotoPria" src="" alt="Pria" class="rounded-t-full border-4 border-[#8b5e34] w-52 h-64 md:w-64 md:h-80 object-cover mx-auto bg-gray-800">
-                            <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-[#8b5e34] text-black px-4 py-1 font-bold text-sm md:text-base">Pria</div>
-                        </div>
-                        <h3 id="namaPria" class="font-vibes text-3xl md:text-4xl mt-8 text-white">Nama Lengkap</h3>
-                        <p id="ortuPria" class="text-xs md:text-sm mt-2 text-gray-400 px-4"></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="event" class="py-16 md:py-20 px-4 bg-[#1a1a1a] relative w-full">
-            <div class="max-w-5xl mx-auto border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/30 backdrop-blur-sm">
-                <div class="text-center mb-10 md:mb-12">
-                    <h2 class="font-serif text-3xl md:text-4xl text-white italic" data-aos="zoom-in">Rangkaian Acara</h2>
-                    <div class="h-1 w-20 md:w-24 bg-[#8b5e34] mx-auto mt-4"></div>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-8 md:gap-10 text-center">
-                    <div class="p-4 md:p-6 border-b md:border-b-0 md:border-r border-[#8b5e34]" data-aos="fade-up">
-                        <h4 class="font-bold text-xl md:text-2xl mb-6 text-white font-serif">Akad Nikah</h4>
-                        <p class="mb-3 text-sm md:text-base"><i class="fas fa-calendar-days text-[#8b5e34] mr-2"></i> <span id="tglAkadTxt"></span></p>
-                        <p class="mb-3 text-sm md:text-base"><i class="fas fa-clock text-[#8b5e34] mr-2"></i> <span id="jamAkadTxt"></span></p>
-                        <p class="mb-6 text-gray-400 text-xs md:text-sm"><i class="fas fa-map-marker-alt text-[#8b5e34] mr-2"></i> <span id="alamatAkadTxt"></span></p>
-                        <a id="mapAkadLink" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm relative z-10 cursor-pointer">
-                            <i class="fas fa-map-pin"></i> <span>Google Maps</span>
-                        </a>
-                    </div>
-
-                    <div class="p-4 md:p-6" data-aos="fade-up" data-aos-delay="200">
-                        <h4 class="font-bold text-xl md:text-2xl mb-6 text-white font-serif">Resepsi Pernikahan</h4>
-                        <p class="mb-3 text-sm md:text-base"><i class="fas fa-calendar-days text-[#8b5e34] mr-2"></i> <span id="tglResepsiTxt"></span></p>
-                        <p class="mb-3 text-sm md:text-base"><i class="fas fa-clock text-[#8b5e34] mr-2"></i> <span id="jamResepsiTxt"></span></p>
-                        <p class="mb-6 text-gray-400 text-xs md:text-sm"><i class="fas fa-map-marker-alt text-[#8b5e34] mr-2"></i> <span id="alamatResepsiTxt"></span></p>
-                        <a id="mapResepsiLink" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 border border-[#d4a373] text-[#d4a373] px-5 py-2 rounded-full hover:bg-[#d4a373] hover:text-black transition text-sm relative z-10 cursor-pointer">
-                            <i class="fas fa-map-pin"></i> <span>Google Maps</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="album" class="py-16 md:py-20 px-4 bg-[#0f0f0f] w-full hidden">
-            <div class="max-w-5xl mx-auto text-center" data-aos="fade-up">
-                <h2 class="font-serif text-3xl md:text-4xl text-white italic mb-4">Galeri Momen</h2>
-                <div class="h-1 w-20 md:w-24 bg-[#8b5e34] mx-auto mt-4 mb-10"></div>
-                <div id="albumContainer" class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar"></div>
-            </div>
-        </section>
-
-        <section id="gift" class="py-16 md:py-20 px-4 bg-[#1a1a1a] w-full">
-            <div class="max-w-3xl mx-auto text-center border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/40 backdrop-blur-sm" data-aos="fade-up">
-                <h2 class="font-serif text-3xl md:text-4xl text-white italic mb-4">Wedding Gift</h2>
-                <div class="h-1 w-20 md:w-24 bg-[#8b5e34] mx-auto mt-4 mb-8"></div>
-                <p class="text-xs md:text-sm text-gray-400 mb-8">Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Apabila memberi adalah ungkapan tanda kasih Anda, maka Anda dapat memberikan kado secara nontunai.</p>
-                
-                <div id="giftContainer"></div>
-            </div>
-        </section>
-
-        <section id="rsvp" class="py-16 md:py-20 px-4 bg-[#0f0f0f] w-full">
-            <div class="max-w-3xl mx-auto border border-[#8b5e34] p-5 md:p-10 rounded-lg bg-black/40">
-                <div class="text-center mb-8" data-aos="fade-down">
-                    <h2 class="font-serif text-2xl md:text-3xl text-white">Konfirmasi Kehadiran</h2>
-                    <p class="text-xs md:text-sm text-gray-400 mt-2">Mohon konfirmasi kehadiran Anda melalui form berikut.</p>
-                </div>
-                
-                <form id="rsvpForm" data-aos="fade-up">
-                    <div>
-                        <label class="block mb-2 text-xs md:text-sm">Nama Lengkap</label>
-                        <input type="text" id="nama" class="form-input text-sm" required>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block mb-2 text-xs md:text-sm">Jumlah Tamu</label>
-                            <select id="jumlah" class="form-input text-sm">
-                                <option value="1">1 Orang</option>
-                                <option value="2">2 Orang</option>
-                                <option value="3">3 Orang</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block mb-2 text-xs md:text-sm">Konfirmasi Kehadiran</label>
-                            <select id="kehadiran" class="form-input text-sm">
-                                <option value="Hadir">Hadir</option>
-                                <option value="Tidak hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block mb-2 text-xs md:text-sm">Ucapan & Doa</label>
-                        <textarea id="pesan" rows="4" class="form-input text-sm" required></textarea>
-                    </div>
-                    <button type="submit" id="btnSubmit" class="w-full bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-8 py-3 md:py-4 rounded-full transition duration-300 font-bold border border-[#d4a373] text-sm md:text-base">
-                         Kirim & Lanjut WA
-                    </button>
-                </form>
-
-                <div class="mt-12 md:mt-16" data-aos="fade-up">
-                    <h3 class="font-serif text-xl md:text-2xl text-center mb-6 text-white border-t border-[#8b5e34] pt-8">Ucapan & Doa</h3>
-                    <div id="guestbook" class="guestbook-container">
-                        <div class="text-center py-4 text-sm text-gray-400">Memuat ucapan...</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="py-12 md:py-16 bg-black text-center px-4 pb-28 w-full">
-            <div data-aos="fade-up">
-                <div class="flex justify-center space-x-4 mb-6">
-                <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦠ</div>
-                <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦌ</div>
-                <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦮ</div>
-                <div class="w-10 h-10 border border-[#8b5e34] rounded-full flex items-center justify-center text-[#d4a373]">ꦌ</div>
-
-                </div>
-                <p class="text-[10px] md:text-xs text-gray-600">
-                    <a href="https://wa.me/6282323624177" target="_blank" rel="noopener noreferrer" class="hover:text-[#d4a373] transition-colors duration-300 decoration-transparent outline-none">
-                        © <span id="year"></span> Developed by TEWE | Tri W
-                    </a>
-                </p>
-                <p class="text-[10px] md:text-xs text-[#8b5e34] mt-1 font-bold tracking-widest"><span id="footerNames"></span></p>
-            </div>
-        </footer>
-
-        <div class="floating-buttons">
-            <a href="#home"><i class="fas fa-home"></i></a>
-            <a href="#event"><i class="fas fa-calendar-alt"></i></a>
-            <a href="#gift"><i class="fas fa-gift"></i></a>
-            <a href="#rsvp"><i class="fas fa-envelope"></i></a>
-            <button id="music-toggle-btn"><i class="fas fa-pause" id="music-icon"></i></button>
+<div id="donation-popup" style="display:none;">
+    <div class="donation-card">
+        <div class="donation-icon">
+            <i class="fa-solid fa-heart"></i>
         </div>
+        <h2 class="donation-title">Donasi</h2>
+        <div class="donation-message">
+            Jika aplikasi ini bermanfaat, Anda dapat memberikan dukungan melalui scan QRIS berikut.
+        </div>
+        <img
+            class="donation-qr"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020101021126610014COM.GO-JEK.WWW01189360091432488285700210G2488285700303UMI51440014ID.CO.QRIS.WWW0215ID10265069461630303UMI5204504553033605802ID5918TEWE%20DIGITAL%20STORE6011KULON%20PROGO61055565362070703A0163042043"
+            alt="QRIS Donasi"
+        >
+        <div class="donation-label">Alhamdulillahi Jazakumullahu Khoiro</div>
+        <button class="donation-close" onclick="closeDonationPopup()">Tutup</button>
+    </div>
+</div>
 
-        <div id="popupModal" class="fixed inset-0 z-[999999] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div class="bg-[#1a1a1a] border border-[#8b5e34] rounded-2xl p-6 text-center max-w-sm w-[90%] transform scale-95 transition-transform duration-300">
-                <div class="text-[#d4a373] text-4xl md:text-5xl mb-4">
-                    <i class="fas fa-check-circle"></i>
+<div id="mobile-preview-modal">
+    <div class="mobile-preview-card">
+        <div class="mobile-preview-header">
+            <div class="mobile-preview-title">Preview Lelayu</div>
+            <button class="mobile-preview-close" onclick="closeMobilePreview()">×</button>
+        </div>
+        <div id="mobile-preview-content" class="mobile-preview-content"></div>
+    </div>
+</div>
+
+<div class="w-full md:w-80 bg-white flex flex-col h-full z-10 border-r border-gray-100" id="sidebar">
+
+    <div class="sidebar-header">
+        FORM LELAYU
+        <a class="sidebar-whatsapp" href="https://wa.me/6282323624177" target="_blank" rel="noopener noreferrer">Tri Wantoro | Tewe Tech</a>
+    </div>
+
+    <div id="step-info" class="step-indicator">
+        <div class="step-track">
+            <div class="step-item active" id="step-indicator-1">
+                <div class="step-circle">1</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" id="step-indicator-2">
+                <div class="step-circle">2</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" id="step-indicator-3">
+                <div class="step-circle">3</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" id="step-indicator-4">
+                <div class="step-circle">4</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step-container active" id="step-1">
+        <div class="form-area">
+            <div class="step-title-card">
+                <span>DATA JENAZAH</span>
+            </div>
+
+            <div class="checkbox-wrap mb-4">
+                <input type="checkbox" id="check-354" checked onchange="updatePreview()">
+                <label for="check-354">Tampilkan Tulisan 354</label>
+            </div>
+
+            <div class="mb-3">
+                <label>Nama Almarhum/ah</label>
+                <input type="text" id="in-nama" placeholder="Contoh: PAWIRO" oninput="updatePreview()">
+            </div>
+
+            <div class="mb-3">
+                <label>Jenis Kelamin</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="gender" value="laki" onchange="updatePreview()">
+                        <span>Laki-laki</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="gender" value="perempuan" onchange="updatePreview()">
+                        <span>Perempuan</span>
+                    </label>
                 </div>
-                <h3 class="text-xl md:text-2xl font-serif text-white mb-2">Terima Kasih</h3>
-                <p class="text-xs md:text-sm text-gray-300 mb-6">Doa dan ucapan Anda telah berhasil dikirim.</p>
-                <button type="button" id="closePopupBtn" class="bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-8 py-2 rounded-full transition duration-300 border border-[#d4a373] text-sm">Tutup</button>
+            </div>
+
+            <div class="mb-3">
+                <label>Umur (Tahun)</label>
+                <input type="number" id="in-umur" placeholder="Contoh: 87" oninput="updatePreview()">
+            </div>
+
+            <div class="mb-3">
+                <label>Meninggal Karena</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="sebab" value="sakit" onchange="updatePreview()">
+                        <span>Sakit</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="sebab" value="usia" onchange="updatePreview()">
+                        <span>Usia</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="sebab" value="lainnya" onchange="updatePreview()">
+                        <span>Lainnya</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-3" id="sebab-lainnya-wrap" style="display:none;">
+                <label>Keterangan Sebab Meninggal</label>
+                <input type="text" id="in-sebab-lainnya" placeholder="Contoh: komplikasi penyakit" oninput="updatePreview()">
             </div>
         </div>
 
-        <div id="lightboxModal" class="fixed inset-0 z-[999999] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm" onclick="this.classList.add('hidden')">
-            <img id="lightboxImg" src="" class="max-w-[90%] max-h-[90dvh] object-contain rounded-lg border border-[#8b5e34]">
-            <button class="absolute top-4 right-4 text-white text-4xl">&times;</button>
+        <div class="bottom-nav">
+            <button class="btn-nav btn-prev" onclick="prevStep()">Kembali</button>
+            <button class="btn-nav btn-next" onclick="nextStep()">Lanjut</button>
         </div>
-    </main>
+    </div>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwoHua2FfrPAKJ_85jsodWxUftwbLHXW95XQ0ryCDkmMOYOkdbDjrt4uVVS2wby3kwz/exec";
-        const Sheet = "Undangan";
-        const Baris = 3;
-        const HP_Customer = "085707311468";
+    <div class="step-container" id="step-2">
+        <div class="form-area">
+            <div class="step-title-card">
+                <span>WAKTU KEMATIAN</span>
+            </div>
 
-        const door = document.getElementById('door');
-        const openBtn = document.getElementById('openBtn');
-        const bgMusic = document.getElementById('bgMusic');
-        const main = document.querySelector('main');
-        const musicToggleBtn = document.getElementById('music-toggle-btn');
-        const musicIcon = document.getElementById('music-icon');
-        const guestNameElement = document.getElementById('guestName');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        
-        let isMusicPlaying = false;
-        let targetTime = 0;
-        let waTujuan = "";
+            <div class="mb-2">
+                <label>Tanggal</label>
+                <input type="date" id="in-mati-tgl" onchange="syncDateFields('mati'); updatePreview()">
+            </div>
 
-        async function init() {
-            getGuestName();
-            await fetchData();
-            loadingOverlay.style.opacity = "0";
-            setTimeout(() => {
-                loadingOverlay.style.display = "none";
-                door.style.display = "flex";
-                setTimeout(() => {
-                    document.querySelectorAll('.door span').forEach(span => span.classList.add('show'));
-                }, 100);
-            }, 500);
-            setInterval(tick, 1000);
-            loadGuestbookMessages();
-            document.getElementById('year').textContent = new Date().getFullYear();
-        }
+            <div class="mb-2">
+                <label>Jam</label>
+                <input type="time" id="in-mati-jam" onchange="syncTimeField('mati'); updatePreview()">
+            </div>
 
-        function fixUrl(u) {
-            if(!u) return "";
-            const m = u.match(/\/d\/(.+?)\//) || u.match(/id=(.+?)(&|$)/);
-            return m ? `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600` : u;
-        }
+            <div class="mb-2">
+                <label>Tempat</label>
+                <input type="text" id="in-mati-tempat" placeholder="Contoh: RSUD WATES Kulon Progo" oninput="updatePreview()">
+            </div>
+        </div>
 
-        function getBankLogo(bank) {
-            const logos = {
-                "Bank Rakyat Indonesia (BRI)": "https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg",
-                "Bank Mandiri": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg",
-                "Bank Negara Indonesia (BNI)": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Bank_Negara_Indonesia_logo_%282004%29.svg",
-                "Bank Syariah Indonesia (BSI)": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Bank_Syariah_Indonesia.svg",
-                "Bank Tabungan Negara (BTN)": "https://upload.wikimedia.org/wikipedia/commons/c/ca/BTN_2024.svg",
-                "Bank Central Asia (BCA)": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg",
-                "Bank CIMB Niaga": "https://upload.wikimedia.org/wikipedia/commons/3/38/CIMB_Niaga_logo.svg",
-                "Bank Permata": "https://upload.wikimedia.org/wikipedia/id/4/48/PermataBank_logo.svg",
-                "Bank Danamon": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Danamon.svg",
-                "Bank Mega": "https://upload.wikimedia.org/wikipedia/commons/a/af/Bank_Mega_2013.svg",
-                "SeaBank": "https://upload.wikimedia.org/wikipedia/commons/a/ac/SeaBank.svg",
-                "DANA": "https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg",
-                "OVO": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg",
-                "GoPay": "https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg",
-                "ShopeePay": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg",
-                "LinkAja": "https://upload.wikimedia.org/wikipedia/commons/8/85/LinkAja.svg"
-            };
-            return logos[bank] || "";
-        }
+        <div class="bottom-nav">
+            <button class="btn-nav btn-prev" onclick="prevStep()">Kembali</button>
+            <button class="btn-nav btn-next" onclick="nextStep()">Lanjut</button>
+        </div>
+    </div>
 
-        function openLightbox(src) {
-            document.getElementById('lightboxImg').src = src;
-            document.getElementById('lightboxModal').classList.remove('hidden');
-        }
+    <div class="step-container" id="step-3">
+        <div class="form-area">
+            <div class="step-title-card">
+                <span>WAKTU PEMAKAMAN</span>
+            </div>
 
-        async function fetchData() {
-            try {
-                const res = await fetch(`${GAS_URL}?action=getData&kode=${Sheet}&phone=${HP_Customer}&row=${Baris}`);
-                const d = await res.json();
-                if (d.status === "success") {
-                    const nW = d.wanita.namaPanggilan;
-                    const nP = d.pria.namaPanggilan;
-                    waTujuan = d.kontak.wa;
-                    document.title = `The Wedding of ${nW} & ${nP}`;
-                    document.getElementById('doorNameWanita').textContent = nW;
-                    document.getElementById('doorNamePria').textContent = nP;
-                    document.getElementById('heroWanita').textContent = nW;
-                    document.getElementById('heroPria').textContent = nP;
-                    document.getElementById('namaWanita').textContent = d.wanita.namaLengkap;
-                    document.getElementById('ortuWanita').innerHTML = `Putri Ke ${d.wanita.putriKe} dari Bpk. ${d.wanita.ayah} & Ibu ${d.wanita.ibu}`;
-                    document.getElementById('fotoWanita').src = fixUrl(d.media.fotoWanita);
-                    document.getElementById('namaPria').textContent = d.pria.namaLengkap;
-                    document.getElementById('ortuPria').innerHTML = `Putra Ke ${d.pria.putraKe} dari Bpk. ${d.pria.ayah} & Ibu ${d.pria.ibu}`;
-                    document.getElementById('fotoPria').src = fixUrl(d.media.fotoPria);
-                    
-                    const fd = t => {
-                        const x = new Date(t);
-                        return x.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                    };
-                    document.getElementById('tglHeadline').textContent = fd(d.akad.tanggal);
-                    document.getElementById('alamatHeadline').textContent = d.akad.alamat;
-                    document.getElementById('tglAkadTxt').textContent = fd(d.akad.tanggal);
-                    document.getElementById('jamAkadTxt').textContent = `${d.akad.jam} WIB`;
-                    document.getElementById('alamatAkadTxt').textContent = d.akad.alamat;
-                    document.getElementById('mapAkadLink').href = d.akad.map;
-                    document.getElementById('tglResepsiTxt').textContent = fd(d.resepsi.tanggal);
-                    document.getElementById('jamResepsiTxt').textContent = `${d.resepsi.jam} WIB`;
-                    document.getElementById('alamatResepsiTxt').textContent = d.resepsi.alamat;
-                    document.getElementById('mapResepsiLink').href = d.resepsi.map;
-                    
-                    targetTime = new Date(`${d.akad.tanggal} ${d.akad.jam}`).getTime();
-                    
-                    if (d.media && d.media.album) {
-                        const albumUrls = d.media.album.split('\n').filter(url => url.trim() !== '');
-                        if (albumUrls.length > 0) {
-                            document.getElementById('album').classList.remove('hidden');
-                            const albumWrap = document.getElementById('albumContainer');
-                            albumWrap.innerHTML = '';
-                            let delayAlbum = 0;
-                            albumUrls.forEach(u => {
-                                const imgUrl = fixUrl(u);
-                                albumWrap.innerHTML += `<img src="${imgUrl}" class="flex-none w-32 h-32 md:w-48 md:h-48 object-cover rounded-lg border border-[#8b5e34] shadow-lg snap-center cursor-pointer" alt="Gallery" data-aos="fade-in" data-aos-delay="${delayAlbum}" onclick="openLightbox('${imgUrl}')">`;
-                                delayAlbum += 100;
-                            });
-                        }
-                    }
+            <div class="mb-2">
+                <label>Tanggal</label>
+                <input type="date" id="in-makam-tgl" onchange="syncDateFields('makam'); updatePreview()">
+            </div>
 
-                    const giftWrap = document.getElementById('giftContainer');
-                    giftWrap.innerHTML = '';
-                    d.kado.forEach((k, idx) => {
-                        const logoUrl = getBankLogo(k.bank);
-                        const logoDisplay = logoUrl ? `<img src="${logoUrl}" alt="${k.bank}" class="h-10 mb-4 mx-auto object-contain bg-white px-3 py-2 rounded">` : `<p class="text-2xl font-serif text-[#d4a373] mb-2">${k.bank}</p>`;
-                        giftWrap.innerHTML += `
-                        <div class="bg-[#1a1a1a] border border-[#d4a373] rounded-xl p-6 max-w-sm mx-auto shadow-lg relative overflow-hidden mb-6">
-                            ${logoDisplay}
-                            <p class="text-xl md:text-2xl font-mono text-[#d4a373] my-4" id="account-${idx}">${k.nomor}</p>
-                            <p class="text-sm md:text-base text-gray-300 mb-6">${k.nama}</p>
-                            <button onclick="salinTeks('${k.nomor}', this)" class="bg-[#8b5e34] hover:bg-[#6f4a27] text-white px-6 py-2 rounded-full transition duration-300 border border-[#d4a373] text-sm flex items-center justify-center mx-auto space-x-2">
-                                <i class="fas fa-copy"></i>
-                                <span>Salin Rekening</span>
-                            </button>
-                        </div>`;
-                    });
-                    document.getElementById('footerNames').innerHTML = `<strong>• ${nW} & ${nP} •</strong>`;
-                }
-            } catch (e) {}
-        }
+            <div class="mb-2">
+                <label>Jam</label>
+                <input type="time" id="in-makam-jam" onchange="syncTimeField('makam'); updatePreview()">
+            </div>
 
-        function getGuestName() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const name = urlParams.get('to');
-            if (name) {
-                const decName = decodeURIComponent(name.replace(/\+/g, ' '));
-                guestNameElement.textContent = decName;
-                document.getElementById('nama').value = decName;
-            } else {
-                guestNameElement.textContent = 'Tamu Undangan';
-            }
-        }
+            <div class="mb-2">
+                <label>Tempat</label>
+                <input type="text" id="in-makam-tempat" placeholder="Contoh: Pamijen Darussalam" oninput="updatePreview()">
+            </div>
 
-        openBtn.addEventListener('click', () => {
-            const playPromise = bgMusic.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => { isMusicPlaying = true; }).catch(e => {
-                    isMusicPlaying = false;
-                    musicIcon.classList.remove('fa-pause');
-                    musicIcon.classList.add('fa-play');
-                });
-            }
-            door.style.opacity = "0";
-            setTimeout(() => door.style.display = "none", 1000);
-            main.style.display = "block";
-            document.body.classList.replace('lock-scroll', 'unlock-scroll');
-            AOS.init({ once: true, duration: 1000, offset: 50 });
-        });
+            <div class="mb-2">
+                <label>Berangkat Dari</label>
+                <textarea id="in-makam-dari" rows="2" placeholder="Contoh: Bayan Krajan RT 61 RW 19, Kadipiro, Solo" oninput="updatePreview()"></textarea>
+            </div>
+        </div>
 
-        musicToggleBtn.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                bgMusic.play();
-                musicIcon.className = 'fas fa-pause';
-            } else {
-                bgMusic.pause();
-                musicIcon.className = 'fas fa-play';
-            }
-        });
+        <div class="bottom-nav">
+            <button class="btn-nav btn-prev" onclick="prevStep()">Kembali</button>
+            <button class="btn-nav btn-next" onclick="nextStep()">Lanjut</button>
+        </div>
+    </div>
 
-        function tick(){
-            if(targetTime === 0) return;
-            const elCountdown = document.getElementById('countdown');
-            const now = Date.now();
-            const dist = targetTime - now;
-            if(dist <= 0 || isNaN(dist)){
-                elCountdown.innerHTML = `<p class="text-white text-sm md:text-base">Acara sedang berlangsung / telah selesai.</p>`;
-                return;
-            }
-            const d = Math.floor(dist/(1000*60*60*24));
-            const h = Math.floor((dist%(1000*60*60*24))/(1000*60*60));
-            const m = Math.floor((dist%(1000*60*60))/(1000*60));
-            const s = Math.floor((dist%(1000*60))/1000);
-            elCountdown.innerHTML = `
-                <div class="countdown-item"><span class="countdown-number">${d}</span><span class="countdown-label text-[#d4a373]">Hari</span></div>
-                <div class="countdown-item"><span class="countdown-number">${h}</span><span class="countdown-label text-[#d4a373]">Jam</span></div>
-                <div class="countdown-item"><span class="countdown-number">${m}</span><span class="countdown-label text-[#d4a373]">Menit</span></div>
-                <div class="countdown-item"><span class="countdown-number">${s}</span><span class="countdown-label text-[#d4a373]">Detik</span></div>
-            `;
-        }
+    <div class="step-container" id="step-4">
+        <div class="form-area">
+            <div class="step-title-card">
+                <span>TURUT BERDUKA CITA</span>
+            </div>
 
-        function salinTeks(text, btnElement) {
-            const originalHTML = btnElement.innerHTML;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    btnElement.innerHTML = '<i class="fas fa-check"></i> <span>Tersalin!</span>';
-                    setTimeout(() => { btnElement.innerHTML = originalHTML; }, 2000);
-                }).catch(() => fallbackCopy(text, btnElement, originalHTML));
-            } else {
-                fallbackCopy(text, btnElement, originalHTML);
-            }
-        }
+            <div class="p-2 border rounded mb-2 bg-gray-50">
+                <div class="checkbox-wrap">
+                    <input type="checkbox" id="check-pasangan" checked onchange="updatePreview()">
+                    <label for="check-pasangan">Tampilkan Suami / Istri</label>
+                </div>
 
-        function fallbackCopy(text, btnElement, originalHTML) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed"; 
-            textArea.style.opacity = "0";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                if (document.execCommand('copy')) {
-                    btnElement.innerHTML = '<i class="fas fa-check"></i> <span>Tersalin!</span>';
-                    setTimeout(() => { btnElement.innerHTML = originalHTML; }, 2000);
-                }
-            } catch (err) {}
-            document.body.removeChild(textArea);
-        }
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="pasangan" value="suami" onchange="updatePreview()">
+                        <span>Suami</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="pasangan" value="istri" onchange="updatePreview()">
+                        <span>Istri</span>
+                    </label>
+                </div>
 
-        async function loadGuestbookMessages() {
-            const container = document.getElementById('guestbook');
-            try {
-                const response = await fetch(`${GAS_URL}?action=getMessages&kode=${Sheet}&row=${Baris}`);
-                const data = await response.json();
-                container.innerHTML = '';
-                if (data.length === 0) {
-                    container.innerHTML = "<p class='text-center text-gray-400 text-sm'>Belum ada ucapan. Jadilah yang pertama mengirim!</p>";
-                } else {
-                    data.reverse().forEach(item => {
-                        const div = document.createElement('div');
-                        div.className = 'comment-item';
-                        div.innerHTML = `
-                            <div class="mb-2">
-                                <span class="comment-name text-sm md:text-base">${escapeHtml(item.nama)}</span>
-                                <span class="comment-badge">${escapeHtml(item.kehadiran)}</span>
+                <input type="text" id="in-pasangan" placeholder="" oninput="updatePreview()">
+            </div>
+
+            <div class="p-2 border rounded mb-2 bg-gray-50">
+                <div class="checkbox-wrap">
+                    <input type="checkbox" id="check-anak" checked onchange="updatePreview()">
+                    <label for="check-anak">Tampilkan Anak</label>
+                </div>
+
+                <div id="children-list" class="children-list"></div>
+
+                <div class="children-note">
+                    Masukkan nama anak satu per satu. Gunakan + untuk menambah dan × untuk menghapus.
+                </div>
+            </div>
+
+            <div class="p-2 border rounded bg-gray-50">
+                <div class="checkbox-wrap">
+                    <input type="checkbox" id="check-cucu" checked onchange="updatePreview()">
+                    <label for="check-cucu">Tampilkan Cucu</label>
+                </div>
+
+                <div id="grandchildren-list"></div>
+
+                <div class="children-note">
+                    Masukkan jumlah cucu.
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="btn-nav btn-prev" onclick="prevStep()">Kembali</button>
+            <button id="finish-button" class="btn-nav btn-next" onclick="nextStep()">Finish</button>
+        </div>
+    </div>
+</div>
+
+<div id="preview-container">
+    <div id="preview-stage">
+        <div id="paper-wrapper">
+            <div id="paper">
+                <div id="content-area">
+
+                    <div class="relative w-full" id="preview-title-area">
+                        <div class="text-title" id="preview-title">LELAYU</div>
+                    </div>
+
+                    <div class="relative w-full" id="preview-arabic-area">
+                        <div class="text-arabic" id="preview-arabic">
+                            بِسْــــــــــــــــــمِ اللهِ الرَّحْمَنِ الرَّحِيْمِ
+                        </div>
+                        <div id="out-354" class="text-354">354</div>
+                    </div>
+
+                    <div id="dyn-wrapper">
+                        <div id="dyn-content" class="text-dyn w-full flex flex-col items-center">
+
+                            <div id="txt-intro1" class="text-center"></div>
+                            <div id="txt-intro2" class="text-center uppercase font-bold my-1"></div>
+                            <div id="txt-intro3" class="text-center w-5/6 mx-auto"></div>
+                            <div id="out-nama" class="text-name"></div>
+
+                            <div id="age-section">
+                                <span id="txt-age-prefix"></span>
+                                <span id="out-umur"></span>
+                                <span id="txt-age-suffix"></span>
                             </div>
-                            <div class="text-xs md:text-sm text-gray-300 italic">"${escapeHtml(item.pesan)}"</div>
-                        `;
-                        container.appendChild(div);
-                    });
-                }
-            } catch (error) {
-                container.innerHTML = "<p class='text-center text-red-500 text-sm'>Gagal memuat ucapan.</p>";
+
+                            <div class="grid-info">
+                                <div id="lbl-mati-1"></div>
+                                <div>:</div>
+                                <div id="out-mati-hari"></div>
+                                <div id="lbl-mati-2"></div>
+                                <div>:</div>
+                                <div id="out-mati-tgl"></div>
+                                <div id="lbl-mati-3"></div>
+                                <div>:</div>
+                                <div id="out-mati-jam"></div>
+                                <div id="lbl-mati-4"></div>
+                                <div>:</div>
+                                <div id="out-mati-tempat"></div>
+                            </div>
+
+                            <div id="txt-burial-title"></div>
+
+                            <div class="grid-info">
+                                <div id="lbl-makam-1"></div>
+                                <div>:</div>
+                                <div id="out-makam-hari"></div>
+                                <div id="lbl-makam-2"></div>
+                                <div>:</div>
+                                <div id="out-makam-tgl"></div>
+                                <div id="lbl-makam-3"></div>
+                                <div>:</div>
+                                <div id="out-makam-jam"></div>
+                                <div id="lbl-makam-4"></div>
+                                <div>:</div>
+                                <div id="out-makam-tempat"></div>
+                                <div id="lbl-makam-5"></div>
+                                <div>:</div>
+                                <div id="out-makam-dari"></div>
+                            </div>
+
+                            <div id="txt-outro" class="text-justified w-5/6 mx-auto"></div>
+                            <div id="txt-closing1" class="text-center mt-1"></div>
+
+                            <div id="sec-keluarga" class="w-5/6 mx-auto mt-2">
+                                <div id="txt-condolence" class="keluarga-title"></div>
+
+                                <div id="sec-pasangan" class="keluarga-list">
+                                    <div id="lbl-pasangan" class="keluarga-heading"></div>
+                                    <div id="out-pasangan"></div>
+                                </div>
+
+                                <div id="sec-anak" class="keluarga-list">
+                                    <div id="lbl-anak" class="keluarga-heading"></div>
+                                    <div id="out-anak"></div>
+                                </div>
+
+                                <div id="sec-cucu" class="keluarga-list">
+                                    <div id="lbl-cucu" class="keluarga-heading"></div>
+                                    <div id="out-cucu"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-controls">
+        <div class="floating-card">
+
+            <button class="icon-btn" onclick="downloadPNG()" title="Unduh PNG">
+                <svg class="png-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"></circle>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16l5-5 4 4 2-2 7 7"></path>
+                </svg>
+            </button>
+
+            <button class="icon-btn" onclick="downloadPDF()" title="Unduh PDF">
+                <svg class="pdf-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 2h9l5 5v15H6a2 2 0 01-2-2V4a2 2 0 012-2z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2v6h6"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 17h1.5a1.5 1.5 0 000-3H8v5m5 0v-5h1.3a2.5 2.5 0 010 5H13m-5-2h2m2 2h1"></path>
+                </svg>
+            </button>
+
+            <button class="icon-btn donation-icon-btn" onclick="showDonationPopup()" title="Donasi">
+                <i class="fa-solid fa-heart"></i>
+            </button>
+
+            <div class="control-divider"></div>
+
+            <button class="preview-zoom-btn" onclick="zoomIn()" title="Zoom In">+</button>
+            <div id="zoom-value" class="preview-zoom-value">100%</div>
+            <button class="preview-zoom-btn" onclick="zoomOut()" title="Zoom Out">−</button>
+            <button class="preview-zoom-btn" onclick="resetZoom()" title="Reset Zoom">↺</button>
+
+        </div>
+    </div>
+</div>
+
+<script>
+const dict = {
+    id: {
+        i1:"Assalamu'alaikum Wr. Wb.",
+        i2:"INNALILLAHI WAINNA ILAIHI ROJI'UN",
+        i3:"Telah berpulang ke Rahmatullah dengan tenang karena",
+        ap:"Tutup usia",
+        as:"tahun",
+        dm1:"Hari",
+        dm2:"Tanggal",
+        dm3:"Jam",
+        dm4:"Tempat",
+        bt:"Jenazah akan dimakamkan",
+        bm1:"Hari",
+        bm2:"Tanggal",
+        bm3:"Jam",
+        bm4:"Tempat",
+        bm5:"Berangkat dari",
+        ou:"Kepada Bapak/Ibu/Sdr. sekalian apabila semasa hidupnya almarhum/ah memiliki kesalahan, kami sekeluarga memohon maaf yang sebesar-besarnya dan memohon doa agar arwah almarhum/ah diterima di sisi Allah SWT dan diampuni segala dosanya. Aamiin.",
+        c1:"Wassalamu'alaikum Wr. Wb.",
+        cd:"Keluarga yang sedang berduka",
+        spouseSuami:"Suami",
+        spouseIstri:"Istri ",
+        anak:"Anak ",
+        cucu:"Cucu ",
+        causeSakit:"sakit",
+        causeUsia:"usia"
+    },
+    jv: {
+        i1:"Assalamu'alaikum Wr. Wb.",
+        i2:"INNALILLAHI WAINNA ILAIHI ROJI'UN",
+        i3:"Sampun kapundut sowan dateng ngarsanipun Allah SWT kanthi tentrem jalaran",
+        ap:"Puput yuswa",
+        as:"tahun",
+        dm1:"Rikolo dinten",
+        dm2:"Surya kaping",
+        dm3:"Tabuh",
+        dm4:"Wonten",
+        bt:"Jenasah badhe kapetak",
+        bm1:"Dinten",
+        bm2:"Surya kaping",
+        bm3:"Tabuh",
+        bm4:"Wonten",
+        bm5:"Bidhal saking",
+        ou:"Dhumateng Bapak/Ibu/Sdr. sedayanipun mbok bilih rikala sugengipun almarhum/ah hanggadhahi kalepatan dhumateng panjenengan, kula sakulawarga nyuwunaken agunging pangapunten saha nyuwun tambahing pandonga mugi arwahipun almarhum katampi wonten pangayunanipun Allah SWT dipun ngapunten sedaya dosa kalepatanipun. Aamiin.",
+        c1:"Wassalamu'alaikum Wr. Wb.",
+        cd:"Ingkang nandhang dhukito",
+        spouseSuami:"Garwa Kakung",
+        spouseIstri:"Garwa Estri",
+        anak:"Putro",
+        cucu:"Wayah",
+        causeSakit:"gerah",
+        causeUsia:"sepuh"
+    }
+};
+
+let currentLang = 'jv';
+let currentStep = 1;
+const totalSteps = 4;
+let previewZoom = 1;
+let basePreviewScale = 1;
+const minZoom = 0.5;
+const maxZoom = 3;
+const zoomStep = 0.1;
+
+const defaultData = {
+    nama:"PAWIRO (contoh)",
+    umur:"87 (contoh)",
+    matiHari:"Selasa (contoh)",
+    matiTgl:"29 Mei 2026 (contoh)",
+    matiJam:"00.30 WIB (contoh)",
+    matiTempat:"RSUD WATES Kulon Prrogo (contoh)",
+    makamHari:"Selasa (contoh)",
+    makamTgl:"29 Mei 2026 (contoh)",
+    makamJam:"13.30 WIB (contoh)",
+    makamTempat:"Pamijen Darussalam (contoh)",
+    makamDari:"Bayan Krajan RT 61 RW 19, Kadipiro, Solo (contoh)",
+    pasangan:"Sumarni (contoh)",
+    sebabLainnya:"usia"
+};
+
+let childrenData = [
+    "Rohman S - Annisa Rahma (contoh)",
+    "Rendy Wibawa (contoh)"
+];
+
+let grandchildrenData = 1;
+let grandchildrenExample = true;
+
+const dayNames = [
+    "Minggu",
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu"
+];
+
+const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember"
+];
+
+function escapeHTML(value) {
+    return String(value)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+}
+
+function exampleHTML(value) {
+    return escapeHTML(value).replace(/\(contoh\)/gi,'<span class="example-text">(contoh)</span>');
+}
+
+function setPreviewText(id,value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.innerHTML = exampleHTML(value);
+    }
+}
+
+function setLanguage(lang) {
+    currentLang = lang;
+    document.getElementById('lang-modal').style.display = 'none';
+    applyDictionary();
+    updatePreview();
+}
+
+function applyDictionary() {
+    const d = dict[currentLang];
+
+    document.getElementById('txt-intro1').innerText = d.i1;
+    document.getElementById('txt-intro2').innerText = d.i2;
+    document.getElementById('txt-age-prefix').innerText = d.ap;
+    document.getElementById('txt-age-suffix').innerText = d.as;
+    document.getElementById('lbl-mati-1').innerText = d.dm1;
+    document.getElementById('lbl-mati-2').innerText = d.dm2;
+    document.getElementById('lbl-mati-3').innerText = d.dm3;
+    document.getElementById('lbl-mati-4').innerText = d.dm4;
+    document.getElementById('txt-burial-title').innerText = d.bt;
+    document.getElementById('lbl-makam-1').innerText = d.bm1;
+    document.getElementById('lbl-makam-2').innerText = d.bm2;
+    document.getElementById('lbl-makam-3').innerText = d.bm3;
+    document.getElementById('lbl-makam-4').innerText = d.bm4;
+    document.getElementById('lbl-makam-5').innerText = d.bm5;
+    document.getElementById('txt-closing1').innerText = d.c1;
+    document.getElementById('txt-condolence').innerText = d.cd;
+    document.getElementById('lbl-anak').innerText = d.anak;
+    document.getElementById('lbl-cucu').innerText = d.cucu;
+}
+
+function getInputValue(id,fallback) {
+    const element = document.getElementById(id);
+    const value = element ? element.value.trim() : '';
+    return value || fallback;
+}
+
+function getGenderWord() {
+    const selected = document.querySelector('input[name="gender"]:checked');
+
+    return selected && selected.value === 'perempuan'
+        ? 'almarhumah'
+        : 'almarhum';
+}
+
+function getCauseText() {
+    const d = dict[currentLang];
+    const selected = document.querySelector('input[name="sebab"]:checked');
+
+    if (!selected) {
+        return defaultData.sebabLainnya;
+    }
+
+    const cause = selected.value;
+
+    if (cause === 'lainnya') {
+        const custom = document.getElementById('in-sebab-lainnya').value.trim();
+
+        return custom || defaultData.sebabLainnya;
+    }
+
+    if (cause === 'sakit') return d.causeSakit;
+    if (cause === 'usia') return d.causeUsia;
+
+    return cause;
+}
+
+function updateCauseInput() {
+    const selected = document.querySelector('input[name="sebab"]:checked');
+    const value = selected ? selected.value : '';
+
+    document.getElementById('sebab-lainnya-wrap').style.display =
+        value === 'lainnya' ? 'block' : 'none';
+}
+
+function formatDateValue(value) {
+    if (!value) {
+        return '';
+    }
+
+    const parts = value.split('-');
+
+    if (parts.length !== 3) {
+        return '';
+    }
+
+    const year = Number(parts[0]);
+    const month = Number(parts[1]);
+    const day = Number(parts[2]);
+
+    if (!year || !month || !day) {
+        return '';
+    }
+
+    return day + ' ' + monthNames[month - 1] + ' ' + year;
+}
+
+function formatTimeValue(value) {
+    if (!value) {
+        return '';
+    }
+
+    const parts = value.split(':');
+
+    if (parts.length < 2) {
+        return '';
+    }
+
+    return parts[0] + '.' + parts[1] + ' WIB';
+}
+
+function getDayName(value) {
+    if (!value) {
+        return '';
+    }
+
+    const date = new Date(value + 'T00:00:00');
+
+    if (isNaN(date.getTime())) {
+        return '';
+    }
+
+    return dayNames[date.getDay()];
+}
+
+function syncDateFields(type) {
+    updatePreview();
+}
+
+function syncTimeField(type) {
+    const timeInput = document.getElementById(
+        type === 'mati' ? 'in-mati-jam' : 'in-makam-jam'
+    );
+
+    if (!timeInput) {
+        return;
+    }
+
+    timeInput.dataset.formatted = formatTimeValue(timeInput.value);
+}
+
+function getDeathDayValue() {
+    const input = document.getElementById('in-mati-tgl');
+
+    if (input && input.value) {
+        return getDayName(input.value);
+    }
+
+    return defaultData.matiHari;
+}
+
+function getDeathDateValue() {
+    const input = document.getElementById('in-mati-tgl');
+
+    if (input && input.value) {
+        return formatDateValue(input.value);
+    }
+
+    return defaultData.matiTgl;
+}
+
+function getDeathTimeValue() {
+    const input = document.getElementById('in-mati-jam');
+
+    if (input && input.value) {
+        return formatTimeValue(input.value);
+    }
+
+    return defaultData.matiJam;
+}
+
+function getBurialDayValue() {
+    const input = document.getElementById('in-makam-tgl');
+
+    if (input && input.value) {
+        return getDayName(input.value);
+    }
+
+    return defaultData.makamHari;
+}
+
+function getBurialDateValue() {
+    const input = document.getElementById('in-makam-tgl');
+
+    if (input && input.value) {
+        return formatDateValue(input.value);
+    }
+
+    return defaultData.makamTgl;
+}
+
+function getBurialTimeValue() {
+    const input = document.getElementById('in-makam-jam');
+
+    if (input && input.value) {
+        return formatTimeValue(input.value);
+    }
+
+    return defaultData.makamJam;
+}
+
+function renderChildrenInputs() {
+    const container = document.getElementById('children-list');
+    container.innerHTML = '';
+
+    childrenData.forEach(function(child,index) {
+        const row = document.createElement('div');
+        row.className = 'child-row';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = child;
+        input.placeholder = 'Nama anak';
+
+        input.addEventListener('input',function() {
+            childrenData[index] = this.value;
+            updatePreview();
+        });
+
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.className = 'child-btn child-add';
+        addButton.innerHTML = '+';
+        addButton.title = 'Tambah anak';
+
+        addButton.onclick = function() {
+            childrenData.splice(index + 1,0,'');
+            renderChildrenInputs();
+            updatePreview();
+
+            const inputs = document.querySelectorAll('#children-list input');
+
+            if (inputs[index + 1]) {
+                inputs[index + 1].focus();
+            }
+        };
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'child-btn child-remove';
+        removeButton.innerHTML = '×';
+        removeButton.title = 'Hapus anak';
+
+        removeButton.onclick = function() {
+            if (childrenData.length === 1) {
+                childrenData[0] = '';
+            } else {
+                childrenData.splice(index,1);
+            }
+
+            renderChildrenInputs();
+            updatePreview();
+        };
+
+        row.appendChild(input);
+        row.appendChild(addButton);
+        row.appendChild(removeButton);
+        container.appendChild(row);
+    });
+}
+
+function renderGrandchildrenInputs() {
+    const container = document.getElementById('grandchildren-list');
+    container.innerHTML = '';
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.step = '1';
+    input.value = '';
+    input.placeholder = 'Contoh : '+ grandchildrenData;
+
+    input.addEventListener('input',function() {
+        const value = this.value.trim();
+        grandchildrenExample = value === '';
+        grandchildrenData = value === '' ? 0 : Math.max(0, parseInt(value,10) || 0);
+        updatePreview();
+    });
+
+    container.appendChild(input);
+}
+
+function getChildrenText() {
+    return childrenData
+        .map(function(child,index) {
+            const name = child.trim();
+
+            if (!name) return '';
+
+            return (index + 1) + '. ' + name;
+        })
+        .filter(function(item) {
+            return item !== '';
+        })
+        .join('\n');
+}
+
+function getGrandchildrenText() {
+    const value = Number(grandchildrenData);
+
+    if (value <= 0) {
+        return '';
+    }
+
+    if (grandchildrenExample && value === 1) {
+        return '1 (contoh)';
+    }
+
+    return String(value);
+}
+
+function updateStepIndicator() {
+    for (let i = 1; i <= totalSteps; i++) {
+        const item = document.getElementById('step-indicator-' + i);
+
+        item.classList.remove('active','done');
+
+        if (i < currentStep) {
+            item.classList.add('done');
+        }
+
+        if (i === currentStep) {
+            item.classList.add('active');
+        }
+    }
+
+    const lines = document.querySelectorAll('.step-line');
+
+    lines.forEach(function(line,index) {
+        line.style.background = index + 1 < currentStep
+            ? '#0f766e'
+            : '#e2e8f0';
+    });
+}
+
+function showStep(step) {
+    for (let i = 1; i <= totalSteps; i++) {
+        document.getElementById('step-' + i).classList.remove('active');
+    }
+
+    document.getElementById('step-' + step).classList.add('active');
+
+    currentStep = step;
+    updateStepIndicator();
+
+    const activeForm = document.querySelector(
+        '#step-' + step + ' .form-area'
+    );
+
+    if (activeForm) {
+        activeForm.scrollTop = 0;
+    }
+
+    const finishButton = document.getElementById('finish-button');
+
+    if (finishButton) {
+        finishButton.innerText =
+            step === totalSteps ? 'Finish' : 'Lanjut';
+    }
+}
+
+function isStepValid(step) {
+    if (step === 1) {
+        const nama = document.getElementById('in-nama').value.trim();
+        const umur = document.getElementById('in-umur').value.trim();
+        const gender = document.querySelector('input[name="gender"]:checked');
+        const sebab = document.querySelector('input[name="sebab"]:checked');
+
+        if (!nama || !umur || !gender || !sebab) {
+            return false;
+        }
+
+        if (
+            sebab.value === 'lainnya' &&
+            !document.getElementById('in-sebab-lainnya').value.trim()
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    if (step === 2) {
+        const ids = [
+            'in-mati-tgl',
+            'in-mati-jam',
+            'in-mati-tempat'
+        ];
+
+        return ids.every(function(id) {
+            return document.getElementById(id).value.trim() !== '';
+        });
+    }
+
+    if (step === 3) {
+        const ids = [
+            'in-makam-tgl',
+            'in-makam-jam',
+            'in-makam-tempat',
+            'in-makam-dari'
+        ];
+
+        return ids.every(function(id) {
+            return document.getElementById(id).value.trim() !== '';
+        });
+    }
+
+    if (step === 4) {
+        const pasanganAktif =
+            document.getElementById('check-pasangan').checked;
+
+        const anakAktif =
+            document.getElementById('check-anak').checked;
+
+        const cucuAktif =
+            document.getElementById('check-cucu').checked;
+
+        const pasanganTerisi =
+            document.getElementById('in-pasangan').value.trim() !== '';
+
+        const pasanganDipilih =
+            document.querySelector('input[name="pasangan"]:checked');
+
+        const anakTerisi =
+            childrenData.some(function(child) {
+                return child.trim() !== '';
+            });
+
+        const cucuTerisi =
+            Number(grandchildrenData) > 0;
+
+        if (pasanganAktif) {
+            if (!pasanganDipilih || !pasanganTerisi) {
+                return false;
             }
         }
 
-        function escapeHtml(text) {
-            if (!text) return "";
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        if (pasanganAktif && pasanganTerisi && pasanganDipilih) return true;
+        if (anakAktif && anakTerisi) return true;
+        if (cucuAktif && cucuTerisi) return true;
+
+        if (!pasanganAktif && !anakAktif && !cucuAktif) return true;
+
+        return false;
+    }
+
+    return false;
+}
+
+function showPopup(title,message) {
+    document.getElementById('popup-title').innerText = title;
+    document.getElementById('popup-message').innerText = message;
+    document.getElementById('custom-popup').style.display = 'flex';
+}
+
+function closePopup() {
+    document.getElementById('custom-popup').style.display = 'none';
+}
+
+function showDonationPopup() {
+    document.getElementById('donation-popup').style.display = 'flex';
+}
+
+function closeDonationPopup() {
+    document.getElementById('donation-popup').style.display = 'none';
+}
+
+function showValidationNotification(step) {
+    let message = '';
+
+    if (step === 1) {
+        const sebab = document.querySelector('input[name="sebab"]:checked');
+        const gender = document.querySelector('input[name="gender"]:checked');
+
+        if (!document.getElementById('in-nama').value.trim()) {
+            message = 'Silakan masukkan Nama Almarhum/ah terlebih dahulu.';
+        } else if (!gender) {
+            message = 'Silakan pilih Jenis Kelamin terlebih dahulu.';
+        } else if (!document.getElementById('in-umur').value.trim()) {
+            message = 'Silakan masukkan Umur terlebih dahulu.';
+        } else if (!sebab) {
+            message = 'Silakan pilih Meninggal Karena terlebih dahulu.';
+        } else if (
+            sebab.value === 'lainnya' &&
+            !document.getElementById('in-sebab-lainnya').value.trim()
+        ) {
+            message = 'Silakan masukkan keterangan sebab meninggal.';
+        } else {
+            message = 'Silakan lengkapi data pada Step 1 terlebih dahulu.';
+        }
+    }
+
+    if (step === 2) {
+        message = 'Silakan lengkapi semua data waktu kematian terlebih dahulu.';
+    }
+
+    if (step === 3) {
+        message = 'Silakan lengkapi semua data waktu pemakaman terlebih dahulu.';
+    }
+
+    if (step === 4) {
+        const pasanganAktif =
+            document.getElementById('check-pasangan').checked;
+
+        const pasanganDipilih =
+            document.querySelector('input[name="pasangan"]:checked');
+
+        const pasanganTerisi =
+            document.getElementById('in-pasangan').value.trim() !== '';
+
+        if (pasanganAktif && !pasanganDipilih) {
+            message = 'Silakan pilih Suami atau Istri terlebih dahulu.';
+        } else if (pasanganAktif && !pasanganTerisi) {
+            message = 'Silakan masukkan nama Suami atau Istri terlebih dahulu.';
+        } else {
+            message = 'Silakan masukkan minimal satu data keluarga yang ditampilkan terlebih dahulu.';
+        }
+    }
+
+    showPopup('Data Belum Lengkap',message);
+}
+
+function nextStep() {
+    if (!isStepValid(currentStep)) {
+        showValidationNotification(currentStep);
+        return;
+    }
+
+    if (currentStep < totalSteps) {
+        currentStep++;
+        showStep(currentStep);
+        return;
+    }
+
+    showFinishPopup();
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+    }
+}
+
+function resetForm() {
+    currentStep = 1;
+    showStep(currentStep);
+}
+
+function getSummaryValue(id,fallback) {
+    const element = document.getElementById(id);
+
+    const value = element
+        ? element.value.trim()
+        : '';
+
+    return value || fallback;
+}
+
+function buildSummaryItem(label,value) {
+    return '<div class="summary-item"><div>' +
+        escapeHTML(label) +
+        '</div><div>:</div><div>' +
+        exampleHTML(value) +
+        '</div></div>';
+}
+
+function buildFinishSummary() {
+    const gender =
+        document.querySelector('input[name="gender"]:checked');
+
+    const sebab =
+        document.querySelector('input[name="sebab"]:checked');
+
+    const spouse =
+        document.querySelector('input[name="pasangan"]:checked');
+
+    let html = '';
+
+    html += '<div class="summary-section">';
+    html += '<div class="summary-title">Data Almarhum/ah</div>';
+    html += buildSummaryItem(
+        'Nama',
+        getSummaryValue('in-nama',defaultData.nama)
+    );
+
+    html += buildSummaryItem(
+        'Jenis Kelamin',
+        gender
+            ? gender.value === 'laki'
+                ? 'Laki-laki'
+                : 'Perempuan'
+            : '-'
+    );
+
+    html += buildSummaryItem(
+        'Umur',
+        getSummaryValue('in-umur',defaultData.umur)
+    );
+
+    html += buildSummaryItem(
+        'Meninggal Karena',
+        sebab ? getCauseText() : '-'
+    );
+
+    html += '</div>';
+
+    html += '<div class="summary-section">';
+    html += '<div class="summary-title">Waktu Kematian</div>';
+
+    html += buildSummaryItem(
+        'Hari',
+        getDeathDayValue()
+    );
+
+    html += buildSummaryItem(
+        'Tanggal',
+        getDeathDateValue()
+    );
+
+    html += buildSummaryItem(
+        'Jam',
+        getDeathTimeValue()
+    );
+
+    html += buildSummaryItem(
+        'Tempat',
+        getSummaryValue('in-mati-tempat',defaultData.matiTempat)
+    );
+
+    html += '</div>';
+
+    html += '<div class="summary-section">';
+    html += '<div class="summary-title">Waktu Pemakaman</div>';
+
+    html += buildSummaryItem(
+        'Hari',
+        getBurialDayValue()
+    );
+
+    html += buildSummaryItem(
+        'Tanggal',
+        getBurialDateValue()
+    );
+
+    html += buildSummaryItem(
+        'Jam',
+        getBurialTimeValue()
+    );
+
+    html += buildSummaryItem(
+        'Tempat',
+        getSummaryValue('in-makam-tempat',defaultData.makamTempat)
+    );
+
+    html += buildSummaryItem(
+        'Berangkat',
+        getSummaryValue('in-makam-dari',defaultData.makamDari)
+    );
+
+    html += '</div>';
+
+    html += '<div class="summary-section">';
+    html += '<div class="summary-title">Keluarga</div>';
+
+    if (document.getElementById('check-pasangan').checked) {
+        const spouseType = spouse
+            ? spouse.value === 'suami'
+                ? 'Suami'
+                : 'Istri'
+            : 'Pasangan';
+
+        html += buildSummaryItem(
+            spouseType,
+            getSummaryValue('in-pasangan',defaultData.pasangan)
+        );
+    }
+
+    if (document.getElementById('check-anak').checked) {
+        const anak = getChildrenText();
+
+        if (anak) {
+            html += buildSummaryItem(
+                'Anak',
+                anak.replace(/\n/g,' | ')
+            );
+        }
+    }
+
+    if (document.getElementById('check-cucu').checked) {
+        const cucu = getGrandchildrenText();
+
+        if (cucu) {
+            html += buildSummaryItem(
+                'Cucu',
+                cucu
+            );
+        }
+    }
+
+    html += '</div>';
+
+    return html;
+}
+
+function showFinishPopup() {
+    document.getElementById('finish-summary').innerHTML =
+        buildFinishSummary();
+
+    document.getElementById('finish-popup').style.display =
+        'flex';
+}
+
+function closeFinishPopup() {
+    document.getElementById('finish-popup').style.display =
+        'none';
+
+    if (window.innerWidth <= 767) {
+        showMobilePreview();
+    }
+}
+
+function finishAndShowPreview() {
+    document.getElementById('finish-popup').style.display =
+        'none';
+
+    if (window.innerWidth <= 767) {
+        showMobilePreview();
+    }
+}
+
+function showMobilePreview() {
+    const source =
+        document.getElementById('preview-container');
+
+    const target =
+        document.getElementById('mobile-preview-content');
+
+    target.innerHTML = '';
+    target.appendChild(source);
+
+    source.style.display = 'block';
+
+    document.getElementById('mobile-preview-modal').style.display =
+        'flex';
+
+    setTimeout(function() {
+        scalePreview();
+    },100);
+}
+
+function closeMobilePreview() {
+    const source =
+        document.getElementById('preview-container');
+
+    const originalParent =
+        document.body;
+
+    originalParent.appendChild(source);
+
+    source.style.display = 'none';
+
+    document.getElementById('mobile-preview-modal').style.display =
+        'none';
+}
+
+function updatePreview() {
+    updateCauseInput();
+
+    const genderWord = getGenderWord();
+    const causeText = getCauseText();
+    const d = dict[currentLang];
+
+    document.getElementById('out-354').style.display =
+        document.getElementById('check-354').checked
+            ? 'block'
+            : 'none';
+
+    setPreviewText(
+        'out-nama',
+        getInputValue('in-nama',defaultData.nama)
+    );
+
+    setPreviewText(
+        'out-umur',
+        getInputValue('in-umur',defaultData.umur)
+    );
+
+    setPreviewText(
+        'txt-intro3',
+        d.i3 + ' ' + causeText + '.'
+    );
+
+    setPreviewText(
+        'out-mati-hari',
+        getDeathDayValue()
+    );
+
+    setPreviewText(
+        'out-mati-tgl',
+        getDeathDateValue()
+    );
+
+    setPreviewText(
+        'out-mati-jam',
+        getDeathTimeValue()
+    );
+
+    setPreviewText(
+        'out-mati-tempat',
+        getInputValue('in-mati-tempat',defaultData.matiTempat)
+    );
+
+    setPreviewText(
+        'out-makam-hari',
+        getBurialDayValue()
+    );
+
+    setPreviewText(
+        'out-makam-tgl',
+        getBurialDateValue()
+    );
+
+    setPreviewText(
+        'out-makam-jam',
+        getBurialTimeValue()
+    );
+
+    setPreviewText(
+        'out-makam-tempat',
+        getInputValue('in-makam-tempat',defaultData.makamTempat)
+    );
+
+    setPreviewText(
+        'out-makam-dari',
+        getInputValue('in-makam-dari',defaultData.makamDari)
+    );
+
+    setPreviewText(
+        'txt-outro',
+        d.ou.replace(/almarhum\/ah/g,genderWord)
+    );
+
+    const pasanganAktif =
+        document.getElementById('check-pasangan').checked;
+
+    const anakAktif =
+        document.getElementById('check-anak').checked;
+
+    const cucuAktif =
+        document.getElementById('check-cucu').checked;
+
+    document.getElementById('sec-pasangan').style.display =
+        pasanganAktif ? 'block' : 'none';
+
+    document.getElementById('sec-anak').style.display =
+        anakAktif ? 'block' : 'none';
+
+    document.getElementById('sec-cucu').style.display =
+        cucuAktif ? 'block' : 'none';
+
+    setPreviewText(
+        'out-pasangan',
+        getInputValue('in-pasangan',defaultData.pasangan)
+    );
+
+    const selectedSpouse =
+        document.querySelector('input[name="pasangan"]:checked');
+
+    const spouseValue =
+        selectedSpouse
+            ? selectedSpouse.value
+            : 'istri';
+
+    document.getElementById('lbl-pasangan').innerText =
+        spouseValue === 'istri'
+            ? d.spouseIstri
+            : d.spouseSuami;
+
+    document.getElementById('out-anak').innerHTML =
+        exampleHTML(getChildrenText());
+
+    document.getElementById('out-cucu').innerHTML =
+        exampleHTML(getGrandchildrenText());
+
+    adjustFontSize();
+}
+
+function getPreviewFontElements() {
+    return [
+        ['preview-title',52],
+        ['preview-arabic',36],
+        ['out-354',34],
+        ['txt-intro1',20],
+        ['txt-intro2',21],
+        ['txt-intro3',19],
+        ['out-nama',43],
+        ['txt-age-prefix',19],
+        ['out-umur',19],
+        ['txt-age-suffix',19],
+        ['txt-burial-title',19],
+        ['txt-closing1',19],
+        ['txt-outro',18],
+        ['txt-condolence',19],
+        ['lbl-pasangan',18],
+        ['out-pasangan',18],
+        ['lbl-anak',18],
+        ['out-anak',18],
+        ['lbl-cucu',18],
+        ['out-cucu',18]
+    ];
+}
+
+function setPreviewFontScale(scale) {
+    const elements = getPreviewFontElements();
+
+    elements.forEach(function(item) {
+        const element = document.getElementById(item[0]);
+
+        if (!element) {
+            return;
         }
 
-        document.getElementById('rsvpForm').addEventListener('submit', async (e) => {
+        element.style.fontSize =
+            Math.max(item[1] * scale,8) + 'px';
+    });
+
+    document.querySelectorAll('#dyn-content .grid-info').forEach(function(element) {
+        element.style.fontSize =
+            Math.max(18 * scale,8) + 'px';
+
+        element.style.lineHeight =
+            Math.max(1.18,1.28 * scale);
+    });
+
+    document.querySelectorAll('#dyn-content .text-justified').forEach(function(element) {
+        element.style.fontSize =
+            Math.max(18 * scale,8) + 'px';
+
+        element.style.lineHeight =
+            Math.max(1.18,1.35 * scale);
+    });
+
+    document.getElementById('preview-title').style.lineHeight =
+        Math.max(.88,1 * scale);
+
+    document.getElementById('preview-arabic').style.lineHeight =
+        Math.max(1.08,1.35 * scale);
+
+    document.getElementById('out-354').style.lineHeight =
+        Math.max(.88,1 * scale);
+
+    document.getElementById('out-nama').style.lineHeight =
+        Math.max(1,1.1 * scale);
+
+    document.getElementById('txt-intro1').style.lineHeight =
+        Math.max(1.08,1.25 * scale);
+
+    document.getElementById('txt-intro2').style.lineHeight =
+        Math.max(1.08,1.25 * scale);
+
+    document.getElementById('txt-intro3').style.lineHeight =
+        Math.max(1.08,1.3 * scale);
+
+    document.getElementById('txt-burial-title').style.lineHeight =
+        Math.max(1.08,1.3 * scale);
+
+    document.getElementById('txt-closing1').style.lineHeight =
+        Math.max(1.08,1.3 * scale);
+
+    document.getElementById('txt-outro').style.lineHeight =
+        Math.max(1.08,1.35 * scale);
+
+    document.getElementById('txt-condolence').style.lineHeight =
+        Math.max(1.08,1.25 * scale);
+
+    document.getElementById('lbl-pasangan').style.lineHeight =
+        Math.max(1.08,1.25 * scale);
+
+    document.getElementById('out-pasangan').style.lineHeight =
+        Math.max(1.08,1.28 * scale);
+
+    document.getElementById('lbl-anak').style.lineHeight =
+        Math.max(1.08,1.25 * scale);
+
+    document.getElementById('out-anak').style.lineHeight =
+        Math.max(1.08,1.28 * scale);
+
+    document.getElementById('lbl-cucu').style.lineHeight =
+        Math.max(1.08,1.25 * scale);
+
+    document.getElementById('out-cucu').style.lineHeight =
+        Math.max(1.08,1.28 * scale);
+}
+
+function previewContentFits() {
+    const wrapper =
+        document.getElementById('dyn-wrapper');
+
+    const content =
+        document.getElementById('dyn-content');
+
+    if (!wrapper || !content) {
+        return true;
+    }
+
+    return content.scrollHeight <= wrapper.clientHeight + 1;
+}
+
+function adjustFontSize() {
+    const wrapper =
+        document.getElementById('dyn-wrapper');
+
+    const content =
+        document.getElementById('dyn-content');
+
+    if (!wrapper || !content || wrapper.clientHeight <= 0) {
+        return;
+    }
+
+    setPreviewFontScale(1);
+
+    requestAnimationFrame(function() {
+        if (previewContentFits()) {
+            return;
+        }
+
+        let low = 0.35;
+        let high = 1;
+        let best = 0.35;
+
+        for (let i = 0; i < 14; i++) {
+            const middle = (low + high) / 2;
+
+            setPreviewFontScale(middle);
+
+            if (previewContentFits()) {
+                best = middle;
+                low = middle;
+            } else {
+                high = middle;
+            }
+        }
+
+        setPreviewFontScale(best);
+
+        requestAnimationFrame(function() {
+            if (!previewContentFits()) {
+                let emergencyScale = best;
+
+                while (
+                    emergencyScale > 0.3 &&
+                    !previewContentFits()
+                ) {
+                    emergencyScale -= 0.02;
+                    setPreviewFontScale(emergencyScale);
+                }
+            }
+        });
+    });
+}
+
+function scalePreview() {
+    const container =
+        document.getElementById('preview-container');
+
+    if (
+        !container ||
+        container.clientWidth === 0 ||
+        container.clientHeight === 0
+    ) {
+        return;
+    }
+
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+
+    basePreviewScale = Math.min(
+        (cw - 36) / 794,
+        (ch - 36) / 1123
+    );
+
+    if (basePreviewScale > 1) {
+        basePreviewScale = 1;
+    }
+
+    applyZoom();
+}
+
+function applyZoom() {
+    const wrapper =
+        document.getElementById('paper-wrapper');
+
+    const paper =
+        document.getElementById('paper');
+
+    const stage =
+        document.getElementById('preview-stage');
+
+    const zoomValue =
+        document.getElementById('zoom-value');
+
+    const finalScale =
+        basePreviewScale * previewZoom;
+
+    const width =
+        794 * finalScale;
+
+    const height =
+        1123 * finalScale;
+
+    wrapper.style.width =
+        width + 'px';
+
+    wrapper.style.height =
+        height + 'px';
+
+    paper.style.transform =
+        'scale(' + finalScale + ')';
+
+    const container =
+        document.getElementById('preview-container');
+
+    stage.style.width =
+        Math.max(
+            container.clientWidth,
+            width + 36
+        ) + 'px';
+
+    stage.style.height =
+        Math.max(
+            container.clientHeight,
+            height + 36
+        ) + 'px';
+
+    zoomValue.innerText =
+        Math.round(previewZoom * 100) + '%';
+
+    requestAnimationFrame(function() {
+        adjustFontSize();
+    });
+}
+
+function zoomIn() {
+    previewZoom =
+        Math.min(
+            maxZoom,
+            +(previewZoom + zoomStep).toFixed(2)
+        );
+
+    applyZoom();
+}
+
+function zoomOut() {
+    previewZoom =
+        Math.max(
+            minZoom,
+            +(previewZoom - zoomStep).toFixed(2)
+        );
+
+    applyZoom();
+}
+
+function resetZoom() {
+    previewZoom = 1;
+
+    scalePreview();
+
+    const container =
+        document.getElementById('preview-container');
+
+    container.scrollTo({
+        left:0,
+        top:0,
+        behavior:'smooth'
+    });
+}
+
+const previewContainer =
+    document.getElementById('preview-container');
+
+previewContainer.addEventListener(
+    'wheel',
+    function(e) {
+        if (e.ctrlKey) {
             e.preventDefault();
-            const btnSubmit = document.getElementById('btnSubmit');
-            const originalText = btnSubmit.innerHTML;
-            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...';
-            btnSubmit.disabled = true;
 
-            const payload = {
-                type: 'rsvp', 
-                kode: Sheet, 
-                row: Baris,
-                nama: document.getElementById('nama').value,
-                jumlah: document.getElementById('jumlah').value,
-                kehadiran: document.getElementById('kehadiran').value,
-                pesan: document.getElementById('pesan').value
-            };
+            if (e.deltaY < 0) {
+                zoomIn();
+            } else {
+                zoomOut();
+            }
+        }
+    },
+    {passive:false}
+);
 
-            try {
-                await fetch(GAS_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(payload)
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let scrollStartX = 0;
+let scrollStartY = 0;
+
+previewContainer.addEventListener(
+    'mousedown',
+    function(e) {
+        if (e.target.closest('.floating-controls')) {
+            return;
+        }
+
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        scrollStartX = previewContainer.scrollLeft;
+        scrollStartY = previewContainer.scrollTop;
+    }
+);
+
+window.addEventListener(
+    'mousemove',
+    function(e) {
+        if (!isDragging) {
+            return;
+        }
+
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+
+        previewContainer.scrollLeft =
+            scrollStartX - dx;
+
+        previewContainer.scrollTop =
+            scrollStartY - dy;
+    }
+);
+
+window.addEventListener(
+    'mouseup',
+    function() {
+        isDragging = false;
+    }
+);
+
+window.addEventListener(
+    'resize',
+    function() {
+        if (window.innerWidth > 767) {
+            scalePreview();
+        }
+    }
+);
+
+window.addEventListener(
+    'load',
+    function() {
+        renderChildrenInputs();
+        renderGrandchildrenInputs();
+        applyDictionary();
+        updatePreview();
+        scalePreview();
+        showStep(1);
+    }
+);
+
+function waitForPreviewReady() {
+    return new Promise(function(resolve) {
+        const finish = function() {
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    adjustFontSize();
+
+                    requestAnimationFrame(function() {
+                        requestAnimationFrame(function() {
+                            resolve();
+                        });
+                    });
                 });
-            } catch (error) {}
+            });
+        };
 
-            let waNum = waTujuan;
-            if(waNum.startsWith('0')) waNum = '62' + waNum.substring(1);
-            
-            const text = `Assalamu'alaikum, saya konfirmasi kehadiran undangan.\n\n*Nama:* ${payload.nama}\n*Jumlah:* ${payload.jumlah} Orang\n*Kehadiran:* ${payload.kehadiran}\n*Pesan:* ${payload.pesan}`;
-            const waLink = `https://wa.me/${waNum}?text=${encodeURIComponent(text)}`;
-            window.open(waLink, '_blank');
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(finish).catch(finish);
+        } else {
+            finish();
+        }
+    });
+}
 
-            setTimeout(() => {
-                document.getElementById('rsvpForm').reset();
-                getGuestName(); 
-                btnSubmit.innerHTML = originalText;
-                btnSubmit.disabled = false;
-                loadGuestbookMessages(); 
-                document.getElementById('popupModal').classList.remove('hidden');
-            }, 1000);
-        });
+function preparePaperForDownload() {
+    const paper = document.getElementById('paper');
+    const wrapper = document.getElementById('paper-wrapper');
 
-        document.getElementById('closePopupBtn').addEventListener('click', () => {
-            document.getElementById('popupModal').classList.add('hidden');
-        });
-        
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    paper.style.transform = 'scale(1)';
+    paper.style.position = 'relative';
+    paper.style.top = '0';
+    paper.style.left = '0';
+    paper.style.width = '794px';
+    paper.style.height = '1123px';
+    paper.style.minWidth = '794px';
+    paper.style.minHeight = '1123px';
+    paper.style.maxWidth = '794px';
+    paper.style.maxHeight = '1123px';
+
+    wrapper.style.width = '794px';
+    wrapper.style.height = '1123px';
+    wrapper.style.overflow = 'visible';
+
+    paper.offsetHeight;
+
+    return paper;
+}
+
+function restorePaperAfterDownload(oldTransform,oldPosition,oldTop,oldLeft) {
+    const paper = document.getElementById('paper');
+    const wrapper = document.getElementById('paper-wrapper');
+
+    paper.style.transform = oldTransform;
+    paper.style.position = oldPosition;
+    paper.style.top = oldTop;
+    paper.style.left = oldLeft;
+    paper.style.width = '794px';
+    paper.style.height = '1123px';
+    paper.style.minWidth = '794px';
+    paper.style.minHeight = '1123px';
+    paper.style.maxWidth = '794px';
+    paper.style.maxHeight = '1123px';
+
+    wrapper.style.overflow = 'hidden';
+
+    requestAnimationFrame(function() {
+        applyZoom();
+    });
+}
+
+function createExportCanvas() {
+    const paper =
+        document.getElementById('paper');
+
+    return html2canvas(
+        paper,
+        {
+            scale:2,
+            useCORS:true,
+            allowTaint:false,
+            backgroundColor:'#ffffff',
+            width:794,
+            height:1123,
+            windowWidth:794,
+            windowHeight:1123,
+            scrollX:0,
+            scrollY:0,
+            x:0,
+            y:0,
+            logging:false,
+            imageTimeout:15000,
+            removeContainer:true,
+            foreignObjectRendering:false,
+            onclone:function(clonedDocument) {
+                const clonedPaper =
+                    clonedDocument.getElementById('paper');
+
+                const clonedWrapper =
+                    clonedDocument.getElementById('paper-wrapper');
+
+                const clonedContent =
+                    clonedDocument.getElementById('content-area');
+
+                const clonedDynWrapper =
+                    clonedDocument.getElementById('dyn-wrapper');
+
+                const clonedDynContent =
+                    clonedDocument.getElementById('dyn-content');
+
+                if (clonedPaper) {
+                    clonedPaper.style.position = 'relative';
+                    clonedPaper.style.top = '0';
+                    clonedPaper.style.left = '0';
+                    clonedPaper.style.transform = 'none';
+                    clonedPaper.style.width = '794px';
+                    clonedPaper.style.height = '1123px';
+                    clonedPaper.style.minWidth = '794px';
+                    clonedPaper.style.minHeight = '1123px';
+                    clonedPaper.style.maxWidth = '794px';
+                    clonedPaper.style.maxHeight = '1123px';
+                    clonedPaper.style.overflow = 'visible';
+                    clonedPaper.style.boxSizing = 'border-box';
+                }
+
+                if (clonedWrapper) {
+                    clonedWrapper.style.width = '794px';
+                    clonedWrapper.style.height = '1123px';
+                    clonedWrapper.style.minWidth = '794px';
+                    clonedWrapper.style.minHeight = '1123px';
+                    clonedWrapper.style.maxWidth = '794px';
+                    clonedWrapper.style.maxHeight = '1123px';
+                    clonedWrapper.style.overflow = 'visible';
+                    clonedWrapper.style.boxSizing = 'border-box';
+                    clonedWrapper.style.boxShadow = 'none';
+                }
+
+                if (clonedContent) {
+                    clonedContent.style.height = '100%';
+                    clonedContent.style.minHeight = '0';
+                    clonedContent.style.overflow = 'visible';
+                }
+
+                if (clonedDynWrapper) {
+                    clonedDynWrapper.style.overflow = 'visible';
+                    clonedDynWrapper.style.minHeight = '0';
+                }
+
+                if (clonedDynContent) {
+                    clonedDynContent.style.overflow = 'visible';
+                    clonedDynContent.style.maxHeight = 'none';
+                }
+            }
+        }
+    );
+}
+
+function downloadPNG() {
+    const paper =
+        document.getElementById('paper');
+
+    const oldTransform =
+        paper.style.transform;
+
+    const oldPosition =
+        paper.style.position;
+
+    const oldTop =
+        paper.style.top;
+
+    const oldLeft =
+        paper.style.left;
+
+    updatePreview();
+
+    waitForPreviewReady().then(function() {
+        preparePaperForDownload();
+
+        return new Promise(function(resolve) {
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    resolve(createExportCanvas());
+                });
             });
         });
+    }).then(function(canvas) {
 
-        init();
-    </script>
+        restorePaperAfterDownload(
+            oldTransform,
+            oldPosition,
+            oldTop,
+            oldLeft
+        );
+
+        const link =
+            document.createElement('a');
+
+        link.download =
+            'Lelayu.png';
+
+        link.href =
+            canvas.toDataURL('image/png');
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+    }).catch(function() {
+        restorePaperAfterDownload(
+            oldTransform,
+            oldPosition,
+            oldTop,
+            oldLeft
+        );
+    });
+}
+
+function downloadPDF() {
+    const paper =
+        document.getElementById('paper');
+
+    const oldTransform =
+        paper.style.transform;
+
+    const oldPosition =
+        paper.style.position;
+
+    const oldTop =
+        paper.style.top;
+
+    const oldLeft =
+        paper.style.left;
+
+    updatePreview();
+
+    waitForPreviewReady().then(function() {
+        preparePaperForDownload();
+
+        return new Promise(function(resolve) {
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    resolve(createExportCanvas());
+                });
+            });
+        });
+    }).then(function(canvas) {
+
+        restorePaperAfterDownload(
+            oldTransform,
+            oldPosition,
+            oldTop,
+            oldLeft
+        );
+
+        const imgData =
+            canvas.toDataURL('image/png');
+
+        const pdf =
+            new window.jspdf.jsPDF({
+                orientation:'p',
+                unit:'mm',
+                format:'a4',
+                compress:true
+            });
+
+        const pdfWidth =
+            pdf.internal.pageSize.getWidth();
+
+        const pdfHeight =
+            pdf.internal.pageSize.getHeight();
+
+        pdf.addImage(
+            imgData,
+            'PNG',
+            0,
+            0,
+            pdfWidth,
+            pdfHeight,
+            undefined,
+            'FAST'
+        );
+
+        pdf.save('Lelayu.pdf');
+
+    }).catch(function() {
+        restorePaperAfterDownload(
+            oldTransform,
+            oldPosition,
+            oldTop,
+            oldLeft
+        );
+    });
+}
+</script>
+
 </body>
 </html>
