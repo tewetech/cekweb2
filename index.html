@@ -1306,6 +1306,16 @@ label {
     width:100%;
 }
 
+#download-preload {
+    position:fixed;
+    width:1px;
+    height:1px;
+    opacity:0;
+    pointer-events:none;
+    left:-10px;
+    top:-10px;
+}
+
 @media(max-width:767px) {
     html,
     body {
@@ -1558,7 +1568,10 @@ label {
         <div id="finish-summary" class="finish-summary"></div>
 
         <div class="popup-actions">
-            <button class="popup-button secondary" onclick="closeFinishPopup()">Tutup</button>
+            <button class="popup-button donation" onclick="showDonationPopup()">
+                <i class="fa-solid fa-heart mr-1"></i> Donasi
+            </button>
+
             <button class="popup-button" onclick="finishAndShowPreview()">Lihat Preview</button>
 
             <button class="popup-button download-png" onclick="downloadPNG()">
@@ -1569,9 +1582,7 @@ label {
                 <i class="fa-solid fa-file-pdf mr-1"></i> Unduh PDF
             </button>
 
-            <button class="popup-button donation full-width" onclick="showDonationPopup()">
-                <i class="fa-solid fa-heart mr-1"></i> Donasi
-            </button>
+            <button class="popup-button secondary full-width" onclick="closeFinishPopup()">Tutup</button>
         </div>
     </div>
 </div>
@@ -1604,6 +1615,8 @@ label {
         <div id="mobile-preview-content" class="mobile-preview-content"></div>
     </div>
 </div>
+
+<img id="download-preload" src="https://raw.githubusercontent.com/tewetech/aset/main/Full%20Aset%20(Final)/Gambar/Frame%20Lelayu.png" crossorigin="anonymous" alt="">
 
 <div class="w-full md:w-80 bg-white flex flex-col h-full z-10 border-r border-gray-100" id="sidebar">
 
@@ -1948,6 +1961,37 @@ label {
 </div>
 
 <script>
+const FRAME_URL = 'https://raw.githubusercontent.com/tewetech/aset/main/Full%20Aset%20(Final)/Gambar/Frame%20Lelayu.png';
+
+let frameImageReady = false;
+let frameImagePromise = null;
+
+function preloadFrameImage() {
+    if (frameImagePromise) {
+        return frameImagePromise;
+    }
+
+    frameImagePromise = new Promise(function(resolve) {
+        const image = new Image();
+
+        image.crossOrigin = 'anonymous';
+
+        image.onload = function() {
+            frameImageReady = true;
+            resolve(image);
+        };
+
+        image.onerror = function() {
+            frameImageReady = false;
+            resolve(null);
+        };
+
+        image.src = FRAME_URL;
+    });
+
+    return frameImagePromise;
+}
+
 const dict = {
     id: {
         i1:"Assalamu'alaikum Wr. Wb.",
@@ -2836,10 +2880,7 @@ function closeMobilePreview() {
     const source =
         document.getElementById('preview-container');
 
-    const originalParent =
-        document.body;
-
-    originalParent.appendChild(source);
+    document.body.appendChild(source);
 
     source.style.display = 'none';
 
@@ -3335,26 +3376,33 @@ window.addEventListener(
 
 window.addEventListener(
     'load',
-    function() {
+    async function() {
+        await preloadFrameImage();
+
         renderChildrenInputs();
         renderGrandchildrenInputs();
         applyDictionary();
         updatePreview();
         scalePreview();
         showStep(1);
+
+        await waitForPreviewReady();
+        scalePreview();
     }
 );
 
 function waitForPreviewReady() {
     return new Promise(function(resolve) {
         const finish = function() {
-            requestAnimationFrame(function() {
+            preloadFrameImage().then(function() {
                 requestAnimationFrame(function() {
-                    adjustFontSize();
-
                     requestAnimationFrame(function() {
+                        adjustFontSize();
+
                         requestAnimationFrame(function() {
-                            resolve();
+                            requestAnimationFrame(function() {
+                                resolve();
+                            });
                         });
                     });
                 });
@@ -3369,78 +3417,36 @@ function waitForPreviewReady() {
     });
 }
 
-function preparePaperForDownload() {
-    const paper = document.getElementById('paper');
-    const wrapper = document.getElementById('paper-wrapper');
+function waitForImageReady(image) {
+    return new Promise(function(resolve) {
+        if (!image) {
+            resolve();
+            return;
+        }
 
-    paper.style.transform = 'none';
-    paper.style.position = 'relative';
-    paper.style.top = '0';
-    paper.style.left = '0';
-    paper.style.width = '794px';
-    paper.style.height = '1123px';
-    paper.style.minWidth = '794px';
-    paper.style.minHeight = '1123px';
-    paper.style.maxWidth = '794px';
-    paper.style.maxHeight = '1123px';
+        if (image.complete && image.naturalWidth > 0) {
+            resolve();
+            return;
+        }
 
-    wrapper.style.width = '794px';
-    wrapper.style.height = '1123px';
-    wrapper.style.overflow = 'visible';
+        image.onload = function() {
+            resolve();
+        };
 
-    paper.offsetHeight;
-
-    return paper;
-}
-
-function restorePaperAfterDownload(oldTransform,oldPosition,oldTop,oldLeft) {
-    const paper = document.getElementById('paper');
-    const wrapper = document.getElementById('paper-wrapper');
-
-    paper.style.transform = oldTransform;
-    paper.style.position = oldPosition;
-    paper.style.top = oldTop;
-    paper.style.left = oldLeft;
-    paper.style.width = '794px';
-    paper.style.height = '1123px';
-    paper.style.minWidth = '794px';
-    paper.style.minHeight = '1123px';
-    paper.style.maxWidth = '794px';
-    paper.style.maxHeight = '1123px';
-
-    wrapper.style.overflow = 'hidden';
-
-    requestAnimationFrame(function() {
-        applyZoom();
+        image.onerror = function() {
+            resolve();
+        };
     });
 }
 
-function createExportCanvas() {
-    const sourcePaper = document.getElementById('paper');
+function prepareExportClone() {
+    const originalPaper =
+        document.getElementById('paper');
 
-    const exportHost = document.createElement('div');
+    const exportPaper =
+        originalPaper.cloneNode(true);
 
-    exportHost.id = 'export-host';
-    exportHost.style.position = 'fixed';
-    exportHost.style.left = '-100000px';
-    exportHost.style.top = '0';
-    exportHost.style.width = '794px';
-    exportHost.style.height = '1123px';
-    exportHost.style.minWidth = '794px';
-    exportHost.style.minHeight = '1123px';
-    exportHost.style.maxWidth = '794px';
-    exportHost.style.maxHeight = '1123px';
-    exportHost.style.margin = '0';
-    exportHost.style.padding = '0';
-    exportHost.style.overflow = 'visible';
-    exportHost.style.display = 'block';
-    exportHost.style.background = '#ffffff';
-    exportHost.style.zIndex = '-1';
-
-    const exportPaper = sourcePaper.cloneNode(true);
-
-    exportPaper.removeAttribute('id');
-    exportPaper.id = 'export-paper';
+    exportPaper.id = 'paper-export';
 
     exportPaper.style.position = 'relative';
     exportPaper.style.top = '0';
@@ -3453,286 +3459,244 @@ function createExportCanvas() {
     exportPaper.style.minHeight = '1123px';
     exportPaper.style.maxWidth = '794px';
     exportPaper.style.maxHeight = '1123px';
+    exportPaper.style.overflow = 'visible';
+    exportPaper.style.boxSizing = 'border-box';
     exportPaper.style.margin = '0';
     exportPaper.style.padding = '58px 58px';
-    exportPaper.style.boxSizing = 'border-box';
-    exportPaper.style.overflow = 'visible';
-    exportPaper.style.display = 'flex';
 
-    const exportContent =
-        exportPaper.querySelector('#content-area');
+    const exportWrapper =
+        document.createElement('div');
 
-    if (exportContent) {
-        exportContent.id = 'export-content-area';
-        exportContent.style.width = '100%';
-        exportContent.style.height = '100%';
-        exportContent.style.minHeight = '0';
-        exportContent.style.overflow = 'visible';
-        exportContent.style.boxSizing = 'border-box';
-    }
+    exportWrapper.id = 'paper-export-wrapper';
+    exportWrapper.style.position = 'fixed';
+    exportWrapper.style.left = '-10000px';
+    exportWrapper.style.top = '0';
+    exportWrapper.style.width = '794px';
+    exportWrapper.style.height = '1123px';
+    exportWrapper.style.minWidth = '794px';
+    exportWrapper.style.minHeight = '1123px';
+    exportWrapper.style.maxWidth = '794px';
+    exportWrapper.style.maxHeight = '1123px';
+    exportWrapper.style.overflow = 'visible';
+    exportWrapper.style.background = '#fff';
+    exportWrapper.style.boxShadow = 'none';
+    exportWrapper.style.borderRadius = '0';
+    exportWrapper.style.zIndex = '-1';
 
-    const exportDynWrapper =
-        exportPaper.querySelector('#dyn-wrapper');
+    exportWrapper.appendChild(exportPaper);
+    document.body.appendChild(exportWrapper);
 
-    if (exportDynWrapper) {
-        exportDynWrapper.id = 'export-dyn-wrapper';
-        exportDynWrapper.style.overflow = 'visible';
-        exportDynWrapper.style.minHeight = '0';
-        exportDynWrapper.style.height = 'auto';
-        exportDynWrapper.style.flex = '1 1 auto';
-    }
+    const clonedFrame =
+        document.createElement('img');
 
-    const exportDynContent =
-        exportPaper.querySelector('#dyn-content');
+    clonedFrame.crossOrigin = 'anonymous';
+    clonedFrame.src = FRAME_URL;
+    clonedFrame.style.position = 'absolute';
+    clonedFrame.style.width = '1px';
+    clonedFrame.style.height = '1px';
+    clonedFrame.style.opacity = '0';
+    clonedFrame.style.pointerEvents = 'none';
 
-    if (exportDynContent) {
-        exportDynContent.id = 'export-dyn-content';
-        exportDynContent.style.overflow = 'visible';
-        exportDynContent.style.maxHeight = 'none';
-        exportDynContent.style.height = 'auto';
-        exportDynContent.style.flex = '0 0 auto';
-    }
+    exportWrapper.appendChild(clonedFrame);
 
-    exportPaper.querySelectorAll('[id]').forEach(function(element) {
-        if (element.id !== 'export-paper') {
-            element.removeAttribute('id');
-        }
-    });
+    exportPaper.style.backgroundImage =
+        'url("' + FRAME_URL + '")';
 
-    exportHost.appendChild(exportPaper);
-    document.body.appendChild(exportHost);
+    exportPaper.style.backgroundSize =
+        '100% 100%';
 
-    return html2canvas(
-        exportPaper,
-        {
-            scale:2,
-            useCORS:true,
-            allowTaint:false,
-            backgroundColor:'#ffffff',
-            width:794,
-            height:1123,
-            windowWidth:794,
-            windowHeight:1123,
-            scrollX:0,
-            scrollY:0,
-            x:0,
-            y:0,
-            logging:false,
-            imageTimeout:15000,
-            removeContainer:true,
-            foreignObjectRendering:false,
-            onclone:function(clonedDocument) {
-                const clonedPaper =
-                    clonedDocument.getElementById('export-paper');
+    exportPaper.style.backgroundPosition =
+        'center';
 
-                if (clonedPaper) {
-                    clonedPaper.style.position = 'relative';
-                    clonedPaper.style.top = '0';
-                    clonedPaper.style.left = '0';
-                    clonedPaper.style.transform = 'none';
-                    clonedPaper.style.transformOrigin = 'top left';
-                    clonedPaper.style.width = '794px';
-                    clonedPaper.style.height = '1123px';
-                    clonedPaper.style.minWidth = '794px';
-                    clonedPaper.style.minHeight = '1123px';
-                    clonedPaper.style.maxWidth = '794px';
-                    clonedPaper.style.maxHeight = '1123px';
-                    clonedPaper.style.margin = '0';
-                    clonedPaper.style.padding = '58px 58px';
-                    clonedPaper.style.boxSizing = 'border-box';
-                    clonedPaper.style.overflow = 'visible';
-                    clonedPaper.style.display = 'flex';
-                    clonedPaper.style.flexDirection = 'column';
-                    clonedPaper.style.backgroundSize = '100% 100%';
-                    clonedPaper.style.backgroundPosition = 'center';
-                    clonedPaper.style.backgroundRepeat = 'no-repeat';
-                }
+    exportPaper.style.backgroundRepeat =
+        'no-repeat';
 
-                const clonedContent =
-                    clonedDocument.getElementById('export-content-area');
+    return {
+        wrapper:exportWrapper,
+        paper:exportPaper,
+        image:clonedFrame
+    };
+}
 
-                if (clonedContent) {
-                    clonedContent.style.width = '100%';
-                    clonedContent.style.height = '100%';
-                    clonedContent.style.minHeight = '0';
-                    clonedContent.style.overflow = 'visible';
-                    clonedContent.style.boxSizing = 'border-box';
-                    clonedContent.style.paddingBottom = '36px';
-                }
+function createExportCanvas() {
+    return preloadFrameImage().then(function() {
+        return waitForPreviewReady();
+    }).then(function() {
+        const exportData =
+            prepareExportClone();
 
-                const clonedDynWrapper =
-                    clonedDocument.getElementById('export-dyn-wrapper');
+        return waitForImageReady(exportData.image).then(function() {
+            return new Promise(function(resolve) {
+                requestAnimationFrame(function() {
+                    requestAnimationFrame(function() {
+                        resolve({
+                            canvasPromise:html2canvas(
+                                exportData.paper,
+                                {
+                                    scale:2,
+                                    useCORS:true,
+                                    allowTaint:false,
+                                    backgroundColor:'#ffffff',
+                                    width:794,
+                                    height:1123,
+                                    windowWidth:794,
+                                    windowHeight:1123,
+                                    scrollX:0,
+                                    scrollY:0,
+                                    x:0,
+                                    y:0,
+                                    logging:false,
+                                    imageTimeout:30000,
+                                    removeContainer:true,
+                                    foreignObjectRendering:false,
+                                    onclone:function(clonedDocument) {
+                                        const clonedPaper =
+                                            clonedDocument.getElementById('paper-export');
 
-                if (clonedDynWrapper) {
-                    clonedDynWrapper.style.overflow = 'visible';
-                    clonedDynWrapper.style.minHeight = '0';
-                    clonedDynWrapper.style.height = 'auto';
-                    clonedDynWrapper.style.flex = '1 1 auto';
-                    clonedDynWrapper.style.display = 'flex';
-                    clonedDynWrapper.style.flexDirection = 'column';
-                    clonedDynWrapper.style.justifyContent = 'center';
-                    clonedDynWrapper.style.alignItems = 'center';
-                }
+                                        const clonedWrapper =
+                                            clonedDocument.getElementById('paper-export-wrapper');
 
-                const clonedDynContent =
-                    clonedDocument.getElementById('export-dyn-content');
+                                        const clonedContent =
+                                            clonedDocument.getElementById('content-area');
 
-                if (clonedDynContent) {
-                    clonedDynContent.style.overflow = 'visible';
-                    clonedDynContent.style.maxHeight = 'none';
-                    clonedDynContent.style.height = 'auto';
-                    clonedDynContent.style.flex = '0 0 auto';
-                    clonedDynContent.style.width = '100%';
-                }
+                                        const clonedDynWrapper =
+                                            clonedDocument.getElementById('dyn-wrapper');
 
-                clonedDocument.querySelectorAll('#export-paper *').forEach(function(element) {
-                    element.style.animation = 'none';
-                    element.style.transition = 'none';
+                                        const clonedDynContent =
+                                            clonedDocument.getElementById('dyn-content');
+
+                                        if (clonedPaper) {
+                                            clonedPaper.style.position = 'relative';
+                                            clonedPaper.style.top = '0';
+                                            clonedPaper.style.left = '0';
+                                            clonedPaper.style.transform = 'none';
+                                            clonedPaper.style.width = '794px';
+                                            clonedPaper.style.height = '1123px';
+                                            clonedPaper.style.minWidth = '794px';
+                                            clonedPaper.style.minHeight = '1123px';
+                                            clonedPaper.style.maxWidth = '794px';
+                                            clonedPaper.style.maxHeight = '1123px';
+                                            clonedPaper.style.overflow = 'visible';
+                                            clonedPaper.style.boxSizing = 'border-box';
+                                            clonedPaper.style.backgroundImage =
+                                                'url("' + FRAME_URL + '")';
+                                            clonedPaper.style.backgroundSize = '100% 100%';
+                                            clonedPaper.style.backgroundPosition = 'center';
+                                            clonedPaper.style.backgroundRepeat = 'no-repeat';
+                                        }
+
+                                        if (clonedWrapper) {
+                                            clonedWrapper.style.position = 'relative';
+                                            clonedWrapper.style.left = '0';
+                                            clonedWrapper.style.top = '0';
+                                            clonedWrapper.style.width = '794px';
+                                            clonedWrapper.style.height = '1123px';
+                                            clonedWrapper.style.minWidth = '794px';
+                                            clonedWrapper.style.minHeight = '1123px';
+                                            clonedWrapper.style.maxWidth = '794px';
+                                            clonedWrapper.style.maxHeight = '1123px';
+                                            clonedWrapper.style.overflow = 'visible';
+                                            clonedWrapper.style.boxSizing = 'border-box';
+                                            clonedWrapper.style.boxShadow = 'none';
+                                        }
+
+                                        if (clonedContent) {
+                                            clonedContent.style.height = '100%';
+                                            clonedContent.style.minHeight = '0';
+                                            clonedContent.style.overflow = 'visible';
+                                        }
+
+                                        if (clonedDynWrapper) {
+                                            clonedDynWrapper.style.overflow = 'visible';
+                                            clonedDynWrapper.style.minHeight = '0';
+                                        }
+
+                                        if (clonedDynContent) {
+                                            clonedDynContent.style.overflow = 'visible';
+                                            clonedDynContent.style.maxHeight = 'none';
+                                        }
+                                    }
+                                }
+                            )
+                        });
+                    });
                 });
-            }
-        }
-    ).finally(function() {
-        if (exportHost && exportHost.parentNode) {
-            exportHost.parentNode.removeChild(exportHost);
-        }
+            }).then(function(result) {
+                return result.canvasPromise.then(function(canvas) {
+                    exportData.wrapper.remove();
+                    return canvas;
+                }).catch(function(error) {
+                    exportData.wrapper.remove();
+                    throw error;
+                });
+            });
+        });
     });
 }
 
 function downloadPNG() {
-    const paper =
-        document.getElementById('paper');
-
-    const oldTransform =
-        paper.style.transform;
-
-    const oldPosition =
-        paper.style.position;
-
-    const oldTop =
-        paper.style.top;
-
-    const oldLeft =
-        paper.style.left;
-
     updatePreview();
 
-    waitForPreviewReady().then(function() {
-        preparePaperForDownload();
+    waitForPreviewReady()
+        .then(function() {
+            return createExportCanvas();
+        })
+        .then(function(canvas) {
+            const link =
+                document.createElement('a');
 
-        return new Promise(function(resolve) {
-            requestAnimationFrame(function() {
-                requestAnimationFrame(function() {
-                    resolve(createExportCanvas());
-                });
-            });
-        });
-    }).then(function(canvas) {
+            link.download =
+                'Lelayu.png';
 
-        restorePaperAfterDownload(
-            oldTransform,
-            oldPosition,
-            oldTop,
-            oldLeft
-        );
+            link.href =
+                canvas.toDataURL('image/png');
 
-        const link =
-            document.createElement('a');
-
-        link.download =
-            'Lelayu.png';
-
-        link.href =
-            canvas.toDataURL('image/png');
-
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-
-    }).catch(function() {
-        restorePaperAfterDownload(
-            oldTransform,
-            oldPosition,
-            oldTop,
-            oldLeft
-        );
-    });
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        })
+        .catch(function() {});
 }
 
 function downloadPDF() {
-    const paper =
-        document.getElementById('paper');
-
-    const oldTransform =
-        paper.style.transform;
-
-    const oldPosition =
-        paper.style.position;
-
-    const oldTop =
-        paper.style.top;
-
-    const oldLeft =
-        paper.style.left;
-
     updatePreview();
 
-    waitForPreviewReady().then(function() {
-        preparePaperForDownload();
+    waitForPreviewReady()
+        .then(function() {
+            return createExportCanvas();
+        })
+        .then(function(canvas) {
+            const imgData =
+                canvas.toDataURL('image/png');
 
-        return new Promise(function(resolve) {
-            requestAnimationFrame(function() {
-                requestAnimationFrame(function() {
-                    resolve(createExportCanvas());
+            const pdf =
+                new window.jspdf.jsPDF({
+                    orientation:'p',
+                    unit:'mm',
+                    format:'a4',
+                    compress:true
                 });
-            });
-        });
-    }).then(function(canvas) {
 
-        restorePaperAfterDownload(
-            oldTransform,
-            oldPosition,
-            oldTop,
-            oldLeft
-        );
+            const pdfWidth =
+                pdf.internal.pageSize.getWidth();
 
-        const imgData =
-            canvas.toDataURL('image/png');
+            const pdfHeight =
+                pdf.internal.pageSize.getHeight();
 
-        const pdf =
-            new window.jspdf.jsPDF({
-                orientation:'p',
-                unit:'mm',
-                format:'a4',
-                compress:true
-            });
+            pdf.addImage(
+                imgData,
+                'PNG',
+                0,
+                0,
+                pdfWidth,
+                pdfHeight,
+                undefined,
+                'FAST'
+            );
 
-        const pdfWidth =
-            pdf.internal.pageSize.getWidth();
-
-        const pdfHeight =
-            pdf.internal.pageSize.getHeight();
-
-        pdf.addImage(
-            imgData,
-            'PNG',
-            0,
-            0,
-            pdfWidth,
-            pdfHeight,
-            undefined,
-            'FAST'
-        );
-
-        pdf.save('Lelayu.pdf');
-
-    }).catch(function() {
-        restorePaperAfterDownload(
-            oldTransform,
-            oldPosition,
-            oldTop,
-            oldLeft
-        );
-    });
+            pdf.save('Lelayu.pdf');
+        })
+        .catch(function() {});
 }
 </script>
 
