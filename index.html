@@ -268,16 +268,6 @@ body {
     grid-column:1 / -1;
 }
 
-.popup-language-button {
-    background:#f0fdfa!important;
-    color:#0f766e!important;
-    border:1px solid #99f6e4!important;
-}
-
-.popup-language-button:hover {
-    background:#ccfbf1!important;
-}
-
 .finish-summary {
     text-align:left;
     margin-top:18px;
@@ -865,12 +855,16 @@ body {
 }
 
 .lang-icon-btn {
-    color:#0f766e;
+    color:#2563eb;
 }
 
 .lang-icon-btn:hover {
-    background:#f0fdfa;
-    border-color:#99f6e4;
+    background:#eff6ff;
+    border-color:#bfdbfe;
+}
+
+.lang-icon-btn:hover i {
+    color:#2563eb;
 }
 
 .control-divider {
@@ -921,29 +915,32 @@ body {
 
 .download-loading {
     pointer-events:none!important;
-    opacity:.85!important;
+    opacity:.8;
 }
 
-.download-spinner {
-    width:19px;
-    height:19px;
+.download-loading > * {
+    display:none!important;
+}
+
+.download-loading::after {
+    content:'';
+    width:18px;
+    height:18px;
     border:2px solid currentColor;
-    border-right-color:transparent;
+    border-top-color:transparent;
     border-radius:50%;
-    display:block;
     animation:downloadSpin .7s linear infinite;
+}
+
+.popup-button.download-loading::after {
+    width:17px;
+    height:17px;
 }
 
 @keyframes downloadSpin {
     to {
         transform:rotate(360deg);
     }
-}
-
-.popup-button .download-spinner {
-    width:18px;
-    height:18px;
-    margin:0 auto;
 }
 
 .sidebar-header {
@@ -1473,6 +1470,10 @@ label {
         padding:10px 16px;
     }
 
+    #mobile-preview-modal {
+        padding:8px;
+    }
+
     .mobile-preview-card #preview-container {
         display:block!important;
         width:100%;
@@ -1495,6 +1496,7 @@ label {
         gap:5px;
         padding:7px;
         border-radius:16px;
+        max-width:calc(100vw - 20px);
     }
 
     .mobile-preview-card .icon-btn,
@@ -1621,17 +1623,12 @@ label {
 
             <button class="popup-button" onclick="finishAndShowPreview()">Lihat Preview</button>
 
-            <button class="popup-button download-png" onclick="downloadPNG(event)">
+            <button id="finish-download-png" class="popup-button download-png" onclick="downloadPNG(this)">
                 <i class="fa-solid fa-image mr-1"></i> Unduh PNG
             </button>
 
-            <button class="popup-button download-pdf" onclick="downloadPDF(event)">
+            <button id="finish-download-pdf" class="popup-button download-pdf" onclick="downloadPDF(this)">
                 <i class="fa-solid fa-file-pdf mr-1"></i> Unduh PDF
-            </button>
-
-            <button class="popup-button popup-language-button full-width" onclick="toggleLanguage()">
-                <i class="fa-solid fa-language mr-1"></i>
-                <span id="finish-language-text">Ganti Bahasa: Jawa</span>
             </button>
 
             <button class="popup-button secondary full-width" onclick="closeFinishPopup()">Tutup</button>
@@ -1981,7 +1978,7 @@ label {
     <div class="floating-controls">
         <div class="floating-card">
 
-            <button class="icon-btn" onclick="downloadPNG(event)" title="Unduh PNG">
+            <button class="icon-btn" onclick="downloadPNG(this)" title="Unduh PNG">
                 <svg class="png-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
                     <circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"></circle>
@@ -1989,7 +1986,7 @@ label {
                 </svg>
             </button>
 
-            <button class="icon-btn" onclick="downloadPDF(event)" title="Unduh PDF">
+            <button class="icon-btn" onclick="downloadPDF(this)" title="Unduh PDF">
                 <svg class="pdf-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 2h9l5 5v15H6a2 2 0 01-2-2V4a2 2 0 012-2z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2v6h6"></path>
@@ -2021,8 +2018,6 @@ const FRAME_URL = 'https://raw.githubusercontent.com/tewetech/aset/main/Full%20A
 
 let frameImageReady = false;
 let frameImagePromise = null;
-let activeDownloadButton = null;
-let activeDownloadOriginalHTML = '';
 
 function preloadFrameImage() {
     if (frameImagePromise) {
@@ -2031,7 +2026,6 @@ function preloadFrameImage() {
 
     frameImagePromise = new Promise(function(resolve) {
         const image = new Image();
-
         image.crossOrigin = 'anonymous';
 
         image.onload = function() {
@@ -2184,22 +2178,16 @@ function setPreviewText(id,value) {
     }
 }
 
-function updateLanguageButtonText() {
-    const finishText = document.getElementById('finish-language-text');
-
-    if (finishText) {
-        finishText.innerText =
-            currentLang === 'id'
-                ? 'Ganti Bahasa: Jawa'
-                : 'Ganti Bahasa: Indonesia';
-    }
-}
-
 function setLanguage(lang) {
     currentLang = lang;
     document.getElementById('lang-modal').style.display = 'none';
     applyDictionary();
-    updateLanguageButtonText();
+    updatePreview();
+}
+
+function toggleLanguage() {
+    currentLang = currentLang === 'id' ? 'jv' : 'id';
+    applyDictionary();
     updatePreview();
 
     requestAnimationFrame(function() {
@@ -2207,10 +2195,6 @@ function setLanguage(lang) {
             adjustFontSize();
         });
     });
-}
-
-function toggleLanguage() {
-    setLanguage(currentLang === 'id' ? 'jv' : 'id');
 }
 
 function applyDictionary() {
@@ -2262,7 +2246,6 @@ function getCauseText() {
 
     if (cause === 'lainnya') {
         const custom = document.getElementById('in-sebab-lainnya').value.trim();
-
         return custom || defaultData.sebabLainnya;
     }
 
@@ -2281,51 +2264,37 @@ function updateCauseInput() {
 }
 
 function formatDateValue(value) {
-    if (!value) {
-        return '';
-    }
+    if (!value) return '';
 
     const parts = value.split('-');
 
-    if (parts.length !== 3) {
-        return '';
-    }
+    if (parts.length !== 3) return '';
 
     const year = Number(parts[0]);
     const month = Number(parts[1]);
     const day = Number(parts[2]);
 
-    if (!year || !month || !day) {
-        return '';
-    }
+    if (!year || !month || !day) return '';
 
     return day + ' ' + monthNames[month - 1] + ' ' + year;
 }
 
 function formatTimeValue(value) {
-    if (!value) {
-        return '';
-    }
+    if (!value) return '';
 
     const parts = value.split(':');
 
-    if (parts.length < 2) {
-        return '';
-    }
+    if (parts.length < 2) return '';
 
     return parts[0] + '.' + parts[1] + ' WIB';
 }
 
 function getDayName(value) {
-    if (!value) {
-        return '';
-    }
+    if (!value) return '';
 
     const date = new Date(value + 'T00:00:00');
 
-    if (isNaN(date.getTime())) {
-        return '';
-    }
+    if (isNaN(date.getTime())) return '';
 
     return dayNames[date.getDay()];
 }
@@ -2339,9 +2308,7 @@ function syncTimeField(type) {
         type === 'mati' ? 'in-mati-jam' : 'in-makam-jam'
     );
 
-    if (!timeInput) {
-        return;
-    }
+    if (!timeInput) return;
 
     timeInput.dataset.formatted = formatTimeValue(timeInput.value);
 }
@@ -2505,9 +2472,7 @@ function getChildrenText() {
 function getGrandchildrenText() {
     const value = Number(grandchildrenData);
 
-    if (value <= 0) {
-        return '';
-    }
+    if (value <= 0) return '';
 
     if (grandchildrenExample && value === 1) {
         return '1 (contoh)';
@@ -2573,9 +2538,7 @@ function isStepValid(step) {
         const gender = document.querySelector('input[name="gender"]:checked');
         const sebab = document.querySelector('input[name="sebab"]:checked');
 
-        if (!nama || !umur || !gender || !sebab) {
-            return false;
-        }
+        if (!nama || !umur || !gender || !sebab) return false;
 
         if (
             sebab.value === 'lainnya' &&
@@ -2637,9 +2600,7 @@ function isStepValid(step) {
             Number(grandchildrenData) > 0;
 
         if (pasanganAktif) {
-            if (!pasanganDipilih || !pasanganTerisi) {
-                return false;
-            }
+            if (!pasanganDipilih || !pasanganTerisi) return false;
         }
 
         if (pasanganAktif && pasanganTerisi && pasanganDipilih) return true;
@@ -2756,11 +2717,7 @@ function resetForm() {
 
 function getSummaryValue(id,fallback) {
     const element = document.getElementById(id);
-
-    const value = element
-        ? element.value.trim()
-        : '';
-
+    const value = element ? element.value.trim() : '';
     return value || fallback;
 }
 
@@ -2786,6 +2743,7 @@ function buildFinishSummary() {
 
     html += '<div class="summary-section">';
     html += '<div class="summary-title">Data Almarhum/ah</div>';
+
     html += buildSummaryItem(
         'Nama',
         getSummaryValue('in-nama',defaultData.nama)
@@ -2815,20 +2773,9 @@ function buildFinishSummary() {
     html += '<div class="summary-section">';
     html += '<div class="summary-title">Waktu Kematian</div>';
 
-    html += buildSummaryItem(
-        'Hari',
-        getDeathDayValue()
-    );
-
-    html += buildSummaryItem(
-        'Tanggal',
-        getDeathDateValue()
-    );
-
-    html += buildSummaryItem(
-        'Jam',
-        getDeathTimeValue()
-    );
+    html += buildSummaryItem('Hari',getDeathDayValue());
+    html += buildSummaryItem('Tanggal',getDeathDateValue());
+    html += buildSummaryItem('Jam',getDeathTimeValue());
 
     html += buildSummaryItem(
         'Tempat',
@@ -2840,20 +2787,9 @@ function buildFinishSummary() {
     html += '<div class="summary-section">';
     html += '<div class="summary-title">Waktu Pemakaman</div>';
 
-    html += buildSummaryItem(
-        'Hari',
-        getBurialDayValue()
-    );
-
-    html += buildSummaryItem(
-        'Tanggal',
-        getBurialDateValue()
-    );
-
-    html += buildSummaryItem(
-        'Jam',
-        getBurialTimeValue()
-    );
+    html += buildSummaryItem('Hari',getBurialDayValue());
+    html += buildSummaryItem('Tanggal',getBurialDateValue());
+    html += buildSummaryItem('Jam',getBurialTimeValue());
 
     html += buildSummaryItem(
         'Tempat',
@@ -2898,10 +2834,7 @@ function buildFinishSummary() {
         const cucu = getGrandchildrenText();
 
         if (cucu) {
-            html += buildSummaryItem(
-                'Cucu',
-                cucu
-            );
+            html += buildSummaryItem('Cucu',cucu);
         }
     }
 
@@ -2914,15 +2847,11 @@ function showFinishPopup() {
     document.getElementById('finish-summary').innerHTML =
         buildFinishSummary();
 
-    updateLanguageButtonText();
-
-    document.getElementById('finish-popup').style.display =
-        'flex';
+    document.getElementById('finish-popup').style.display = 'flex';
 }
 
 function closeFinishPopup() {
-    document.getElementById('finish-popup').style.display =
-        'none';
+    document.getElementById('finish-popup').style.display = 'none';
 
     if (window.innerWidth <= 767) {
         showMobilePreview();
@@ -2930,8 +2859,7 @@ function closeFinishPopup() {
 }
 
 function finishAndShowPreview() {
-    document.getElementById('finish-popup').style.display =
-        'none';
+    document.getElementById('finish-popup').style.display = 'none';
 
     if (window.innerWidth <= 767) {
         showMobilePreview();
@@ -2939,19 +2867,15 @@ function finishAndShowPreview() {
 }
 
 function showMobilePreview() {
-    const source =
-        document.getElementById('preview-container');
-
-    const target =
-        document.getElementById('mobile-preview-content');
+    const source = document.getElementById('preview-container');
+    const target = document.getElementById('mobile-preview-content');
 
     target.innerHTML = '';
     target.appendChild(source);
 
     source.style.display = 'block';
 
-    document.getElementById('mobile-preview-modal').style.display =
-        'flex';
+    document.getElementById('mobile-preview-modal').style.display = 'flex';
 
     setTimeout(function() {
         scalePreview();
@@ -2959,15 +2883,13 @@ function showMobilePreview() {
 }
 
 function closeMobilePreview() {
-    const source =
-        document.getElementById('preview-container');
+    const source = document.getElementById('preview-container');
 
     document.body.appendChild(source);
 
     source.style.display = 'none';
 
-    document.getElementById('mobile-preview-modal').style.display =
-        'none';
+    document.getElementById('mobile-preview-modal').style.display = 'none';
 }
 
 function updatePreview() {
@@ -2997,40 +2919,18 @@ function updatePreview() {
         d.i3 + ' ' + causeText + '.'
     );
 
-    setPreviewText(
-        'out-mati-hari',
-        getDeathDayValue()
-    );
-
-    setPreviewText(
-        'out-mati-tgl',
-        getDeathDateValue()
-    );
-
-    setPreviewText(
-        'out-mati-jam',
-        getDeathTimeValue()
-    );
+    setPreviewText('out-mati-hari',getDeathDayValue());
+    setPreviewText('out-mati-tgl',getDeathDateValue());
+    setPreviewText('out-mati-jam',getDeathTimeValue());
 
     setPreviewText(
         'out-mati-tempat',
         getInputValue('in-mati-tempat',defaultData.matiTempat)
     );
 
-    setPreviewText(
-        'out-makam-hari',
-        getBurialDayValue()
-    );
-
-    setPreviewText(
-        'out-makam-tgl',
-        getBurialDateValue()
-    );
-
-    setPreviewText(
-        'out-makam-jam',
-        getBurialTimeValue()
-    );
+    setPreviewText('out-makam-hari',getBurialDayValue());
+    setPreviewText('out-makam-tgl',getBurialDateValue());
+    setPreviewText('out-makam-jam',getBurialTimeValue());
 
     setPreviewText(
         'out-makam-tempat',
@@ -3123,9 +3023,7 @@ function setPreviewFontScale(scale) {
     elements.forEach(function(item) {
         const element = document.getElementById(item[0]);
 
-        if (!element) {
-            return;
-        }
+        if (!element) return;
 
         element.style.fontSize =
             Math.max(item[1] * scale,8) + 'px';
@@ -3200,36 +3098,24 @@ function setPreviewFontScale(scale) {
 }
 
 function previewContentFits() {
-    const wrapper =
-        document.getElementById('dyn-wrapper');
+    const wrapper = document.getElementById('dyn-wrapper');
+    const content = document.getElementById('dyn-content');
 
-    const content =
-        document.getElementById('dyn-content');
-
-    if (!wrapper || !content) {
-        return true;
-    }
+    if (!wrapper || !content) return true;
 
     return content.scrollHeight <= wrapper.clientHeight + 1;
 }
 
 function adjustFontSize() {
-    const wrapper =
-        document.getElementById('dyn-wrapper');
+    const wrapper = document.getElementById('dyn-wrapper');
+    const content = document.getElementById('dyn-content');
 
-    const content =
-        document.getElementById('dyn-content');
-
-    if (!wrapper || !content || wrapper.clientHeight <= 0) {
-        return;
-    }
+    if (!wrapper || !content || wrapper.clientHeight <= 0) return;
 
     setPreviewFontScale(1);
 
     requestAnimationFrame(function() {
-        if (previewContentFits()) {
-            return;
-        }
+        if (previewContentFits()) return;
 
         let low = 0.35;
         let high = 1;
@@ -3267,8 +3153,7 @@ function adjustFontSize() {
 }
 
 function scalePreview() {
-    const container =
-        document.getElementById('preview-container');
+    const container = document.getElementById('preview-container');
 
     if (
         !container ||
@@ -3294,50 +3179,27 @@ function scalePreview() {
 }
 
 function applyZoom() {
-    const wrapper =
-        document.getElementById('paper-wrapper');
+    const wrapper = document.getElementById('paper-wrapper');
+    const paper = document.getElementById('paper');
+    const stage = document.getElementById('preview-stage');
+    const zoomValue = document.getElementById('zoom-value');
 
-    const paper =
-        document.getElementById('paper');
+    const finalScale = basePreviewScale * previewZoom;
+    const width = 794 * finalScale;
+    const height = 1123 * finalScale;
 
-    const stage =
-        document.getElementById('preview-stage');
+    wrapper.style.width = width + 'px';
+    wrapper.style.height = height + 'px';
 
-    const zoomValue =
-        document.getElementById('zoom-value');
+    paper.style.transform = 'scale(' + finalScale + ')';
 
-    const finalScale =
-        basePreviewScale * previewZoom;
-
-    const width =
-        794 * finalScale;
-
-    const height =
-        1123 * finalScale;
-
-    wrapper.style.width =
-        width + 'px';
-
-    wrapper.style.height =
-        height + 'px';
-
-    paper.style.transform =
-        'scale(' + finalScale + ')';
-
-    const container =
-        document.getElementById('preview-container');
+    const container = document.getElementById('preview-container');
 
     stage.style.width =
-        Math.max(
-            container.clientWidth,
-            width + 36
-        ) + 'px';
+        Math.max(container.clientWidth,width + 36) + 'px';
 
     stage.style.height =
-        Math.max(
-            container.clientHeight,
-            height + 36
-        ) + 'px';
+        Math.max(container.clientHeight,height + 36) + 'px';
 
     zoomValue.innerText =
         Math.round(previewZoom * 100) + '%';
@@ -3425,18 +3287,13 @@ previewContainer.addEventListener(
 window.addEventListener(
     'mousemove',
     function(e) {
-        if (!isDragging) {
-            return;
-        }
+        if (!isDragging) return;
 
         const dx = e.clientX - dragStartX;
         const dy = e.clientY - dragStartY;
 
-        previewContainer.scrollLeft =
-            scrollStartX - dx;
-
-        previewContainer.scrollTop =
-            scrollStartY - dy;
+        previewContainer.scrollLeft = scrollStartX - dx;
+        previewContainer.scrollTop = scrollStartY - dy;
     }
 );
 
@@ -3464,7 +3321,6 @@ window.addEventListener(
         renderChildrenInputs();
         renderGrandchildrenInputs();
         applyDictionary();
-        updateLanguageButtonText();
         updatePreview();
         scalePreview();
         showStep(1);
@@ -3522,306 +3378,229 @@ function waitForImageReady(image) {
     });
 }
 
-function setDownloadLoading(button) {
-    if (!button) {
-        return;
-    }
+async function preparePreviewForExport() {
+    updatePreview();
 
-    if (activeDownloadButton) {
-        return;
-    }
+    await preloadFrameImage();
+    await waitForPreviewReady();
 
-    activeDownloadButton = button;
-    activeDownloadOriginalHTML = button.innerHTML;
-
-    button.classList.add('download-loading');
-    button.setAttribute('aria-disabled','true');
-    button.innerHTML = '<span class="download-spinner"></span>';
-}
-
-function clearDownloadLoading() {
-    if (!activeDownloadButton) {
-        return;
-    }
-
-    activeDownloadButton.classList.remove('download-loading');
-    activeDownloadButton.removeAttribute('aria-disabled');
-    activeDownloadButton.innerHTML = activeDownloadOriginalHTML;
-
-    activeDownloadButton = null;
-    activeDownloadOriginalHTML = '';
-}
-
-function createPreviewCanvas() {
-    const paper =
-        document.getElementById('paper');
-
-    if (!paper) {
-        return Promise.reject(new Error('Preview tidak ditemukan'));
-    }
-
-    return preloadFrameImage()
-        .then(function() {
-            return waitForPreviewReady();
-        })
-        .then(function() {
-            return new Promise(function(resolve) {
-                const previousTransform =
-                    paper.style.transform;
-
-                const previousTransformOrigin =
-                    paper.style.transformOrigin;
-
-                const previousPosition =
-                    paper.style.position;
-
-                const previousTop =
-                    paper.style.top;
-
-                const previousLeft =
-                    paper.style.left;
-
-                const previousWidth =
-                    paper.style.width;
-
-                const previousHeight =
-                    paper.style.height;
-
-                const previousMinWidth =
-                    paper.style.minWidth;
-
-                const previousMinHeight =
-                    paper.style.minHeight;
-
-                const previousMaxWidth =
-                    paper.style.maxWidth;
-
-                const previousMaxHeight =
-                    paper.style.maxHeight;
-
-                const previousOverflow =
-                    paper.style.overflow;
-
-                paper.style.transform = 'none';
-                paper.style.transformOrigin = 'top left';
-                paper.style.position = 'absolute';
-                paper.style.top = '0';
-                paper.style.left = '0';
-                paper.style.width = '794px';
-                paper.style.height = '1123px';
-                paper.style.minWidth = '794px';
-                paper.style.minHeight = '1123px';
-                paper.style.maxWidth = '794px';
-                paper.style.maxHeight = '1123px';
-                paper.style.overflow = 'hidden';
-
-                requestAnimationFrame(function() {
-                    requestAnimationFrame(function() {
-                        html2canvas(
-                            paper,
-                            {
-                                scale:2,
-                                useCORS:true,
-                                allowTaint:false,
-                                backgroundColor:'#ffffff',
-                                width:794,
-                                height:1123,
-                                windowWidth:794,
-                                windowHeight:1123,
-                                scrollX:0,
-                                scrollY:0,
-                                x:0,
-                                y:0,
-                                logging:false,
-                                imageTimeout:30000,
-                                removeContainer:true,
-                                foreignObjectRendering:false,
-                                onclone:function(clonedDocument) {
-                                    const clonedPaper =
-                                        clonedDocument.getElementById('paper');
-
-                                    if (clonedPaper) {
-                                        clonedPaper.style.transform = 'none';
-                                        clonedPaper.style.transformOrigin = 'top left';
-                                        clonedPaper.style.position = 'absolute';
-                                        clonedPaper.style.top = '0';
-                                        clonedPaper.style.left = '0';
-                                        clonedPaper.style.width = '794px';
-                                        clonedPaper.style.height = '1123px';
-                                        clonedPaper.style.minWidth = '794px';
-                                        clonedPaper.style.minHeight = '1123px';
-                                        clonedPaper.style.maxWidth = '794px';
-                                        clonedPaper.style.maxHeight = '1123px';
-                                        clonedPaper.style.overflow = 'hidden';
-                                        clonedPaper.style.backgroundImage =
-                                            'url("' + FRAME_URL + '")';
-                                        clonedPaper.style.backgroundSize = '100% 100%';
-                                        clonedPaper.style.backgroundPosition = 'center';
-                                        clonedPaper.style.backgroundRepeat = 'no-repeat';
-                                    }
-
-                                    const clonedContent =
-                                        clonedDocument.getElementById('content-area');
-
-                                    if (clonedContent) {
-                                        clonedContent.style.width = '100%';
-                                        clonedContent.style.height = '100%';
-                                        clonedContent.style.minHeight = '0';
-                                        clonedContent.style.overflow = 'visible';
-                                        clonedContent.style.paddingBottom = '36px';
-                                    }
-
-                                    const clonedDynWrapper =
-                                        clonedDocument.getElementById('dyn-wrapper');
-
-                                    if (clonedDynWrapper) {
-                                        clonedDynWrapper.style.overflow = 'visible';
-                                        clonedDynWrapper.style.minHeight = '0';
-                                    }
-
-                                    const clonedDynContent =
-                                        clonedDocument.getElementById('dyn-content');
-
-                                    if (clonedDynContent) {
-                                        clonedDynContent.style.overflow = 'visible';
-                                        clonedDynContent.style.maxHeight = 'none';
-                                    }
-                                }
-                            }
-                        )
-                        .then(function(canvas) {
-                            paper.style.transform = previousTransform;
-                            paper.style.transformOrigin = previousTransformOrigin;
-                            paper.style.position = previousPosition;
-                            paper.style.top = previousTop;
-                            paper.style.left = previousLeft;
-                            paper.style.width = previousWidth;
-                            paper.style.height = previousHeight;
-                            paper.style.minWidth = previousMinWidth;
-                            paper.style.minHeight = previousMinHeight;
-                            paper.style.maxWidth = previousMaxWidth;
-                            paper.style.maxHeight = previousMaxHeight;
-                            paper.style.overflow = previousOverflow;
-
-                            resolve(canvas);
-                        })
-                        .catch(function(error) {
-                            paper.style.transform = previousTransform;
-                            paper.style.transformOrigin = previousTransformOrigin;
-                            paper.style.position = previousPosition;
-                            paper.style.top = previousTop;
-                            paper.style.left = previousLeft;
-                            paper.style.width = previousWidth;
-                            paper.style.height = previousHeight;
-                            paper.style.minWidth = previousMinWidth;
-                            paper.style.minHeight = previousMinHeight;
-                            paper.style.maxWidth = previousMaxWidth;
-                            paper.style.maxHeight = previousMaxHeight;
-                            paper.style.overflow = previousOverflow;
-
-                            throw error;
-                        });
-                    });
-                });
+    await new Promise(function(resolve) {
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                resolve();
             });
         });
+    });
+
+    adjustFontSize();
+
+    await new Promise(function(resolve) {
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                resolve();
+            });
+        });
+    });
+
+    const paper = document.getElementById('paper');
+
+    const oldTransform = paper.style.transform;
+    const oldPosition = paper.style.position;
+    const oldLeft = paper.style.left;
+    const oldTop = paper.style.top;
+
+    paper.style.transform = 'none';
+    paper.style.position = 'relative';
+    paper.style.left = '0';
+    paper.style.top = '0';
+
+    await new Promise(function(resolve) {
+        requestAnimationFrame(function() {
+            requestAnimationFrame(resolve);
+        });
+    });
+
+    return function() {
+        paper.style.transform = oldTransform;
+        paper.style.position = oldPosition;
+        paper.style.left = oldLeft;
+        paper.style.top = oldTop;
+    };
 }
 
-function downloadPNG(event) {
-    const button =
-        event && event.currentTarget
-            ? event.currentTarget
-            : null;
+async function createExportCanvas() {
+    const restorePreview = await preparePreviewForExport();
+    const paper = document.getElementById('paper');
 
-    if (activeDownloadButton) {
-        return;
+    try {
+        const canvas = await html2canvas(
+            paper,
+            {
+                scale:3,
+                useCORS:true,
+                allowTaint:false,
+                backgroundColor:'#ffffff',
+                width:794,
+                height:1123,
+                windowWidth:794,
+                windowHeight:1123,
+                scrollX:0,
+                scrollY:0,
+                x:0,
+                y:0,
+                logging:false,
+                imageTimeout:30000,
+                removeContainer:true,
+                foreignObjectRendering:false,
+                onclone:function(clonedDocument) {
+                    const clonedPaper =
+                        clonedDocument.getElementById('paper');
+
+                    if (!clonedPaper) return;
+
+                    clonedPaper.style.position = 'relative';
+                    clonedPaper.style.left = '0';
+                    clonedPaper.style.top = '0';
+                    clonedPaper.style.transform = 'none';
+                    clonedPaper.style.transformOrigin = 'top left';
+                    clonedPaper.style.width = '794px';
+                    clonedPaper.style.height = '1123px';
+                    clonedPaper.style.minWidth = '794px';
+                    clonedPaper.style.minHeight = '1123px';
+                    clonedPaper.style.maxWidth = '794px';
+                    clonedPaper.style.maxHeight = '1123px';
+                    clonedPaper.style.padding = '58px 58px';
+                    clonedPaper.style.overflow = 'hidden';
+                    clonedPaper.style.boxSizing = 'border-box';
+                    clonedPaper.style.backgroundImage =
+                        'url("' + FRAME_URL + '")';
+                    clonedPaper.style.backgroundSize = '100% 100%';
+                    clonedPaper.style.backgroundPosition = 'center';
+                    clonedPaper.style.backgroundRepeat = 'no-repeat';
+
+                    const clonedContent =
+                        clonedDocument.getElementById('content-area');
+
+                    const clonedDynWrapper =
+                        clonedDocument.getElementById('dyn-wrapper');
+
+                    const clonedDynContent =
+                        clonedDocument.getElementById('dyn-content');
+
+                    if (clonedContent) {
+                        clonedContent.style.width = '100%';
+                        clonedContent.style.height = '100%';
+                        clonedContent.style.minHeight = '0';
+                        clonedContent.style.paddingBottom = '36px';
+                        clonedContent.style.overflow = 'visible';
+                    }
+
+                    if (clonedDynWrapper) {
+                        clonedDynWrapper.style.overflow = 'visible';
+                        clonedDynWrapper.style.minHeight = '0';
+                    }
+
+                    if (clonedDynContent) {
+                        clonedDynContent.style.overflow = 'visible';
+                        clonedDynContent.style.maxHeight = 'none';
+                    }
+                }
+            }
+        );
+
+        return canvas;
+    } finally {
+        restorePreview();
     }
-
-    setDownloadLoading(button);
-
-    updatePreview();
-
-    waitForPreviewReady()
-        .then(function() {
-            return createPreviewCanvas();
-        })
-        .then(function(canvas) {
-            const link =
-                document.createElement('a');
-
-            link.download =
-                'Lelayu.png';
-
-            link.href =
-                canvas.toDataURL('image/png');
-
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        })
-        .catch(function() {})
-        .finally(function() {
-            setTimeout(function() {
-                clearDownloadLoading();
-            },300);
-        });
 }
 
-function downloadPDF(event) {
-    const button =
-        event && event.currentTarget
-            ? event.currentTarget
-            : null;
+function setDownloadLoading(button,loading) {
+    if (!button) return;
 
-    if (activeDownloadButton) {
-        return;
+    if (loading) {
+        button.classList.add('download-loading');
+        button.setAttribute('aria-busy','true');
+        button.dataset.originalPointer = button.style.pointerEvents;
+    } else {
+        button.classList.remove('download-loading');
+        button.removeAttribute('aria-busy');
+        button.style.pointerEvents =
+            button.dataset.originalPointer || '';
     }
+}
 
-    setDownloadLoading(button);
+let downloadBusy = false;
 
-    updatePreview();
+async function downloadPNG(button) {
+    if (downloadBusy) return;
 
-    waitForPreviewReady()
-        .then(function() {
-            return createPreviewCanvas();
-        })
-        .then(function(canvas) {
-            const imgData =
-                canvas.toDataURL('image/png');
+    downloadBusy = true;
+    setDownloadLoading(button,true);
 
-            const pdf =
-                new window.jspdf.jsPDF({
-                    orientation:'p',
-                    unit:'mm',
-                    format:'a4',
-                    compress:true
-                });
+    try {
+        const canvas = await createExportCanvas();
 
-            const pdfWidth =
-                pdf.internal.pageSize.getWidth();
-
-            const pdfHeight =
-                pdf.internal.pageSize.getHeight();
-
-            pdf.addImage(
-                imgData,
-                'PNG',
-                0,
-                0,
-                pdfWidth,
-                pdfHeight,
-                undefined,
-                'FAST'
-            );
-
-            pdf.save('Lelayu.pdf');
-        })
-        .catch(function() {})
-        .finally(function() {
-            setTimeout(function() {
-                clearDownloadLoading();
-            },300);
+        await new Promise(function(resolve) {
+            requestAnimationFrame(resolve);
         });
+
+        const link = document.createElement('a');
+
+        link.download = 'Lelayu.png';
+        link.href = canvas.toDataURL('image/png');
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    } catch(error) {
+    } finally {
+        setDownloadLoading(button,false);
+        downloadBusy = false;
+    }
+}
+
+async function downloadPDF(button) {
+    if (downloadBusy) return;
+
+    downloadBusy = true;
+    setDownloadLoading(button,true);
+
+    try {
+        const canvas = await createExportCanvas();
+
+        const imgData = canvas.toDataURL('image/png');
+
+        const pdf =
+            new window.jspdf.jsPDF({
+                orientation:'p',
+                unit:'mm',
+                format:'a4',
+                compress:true
+            });
+
+        const pdfWidth =
+            pdf.internal.pageSize.getWidth();
+
+        const pdfHeight =
+            pdf.internal.pageSize.getHeight();
+
+        pdf.addImage(
+            imgData,
+            'PNG',
+            0,
+            0,
+            pdfWidth,
+            pdfHeight,
+            undefined,
+            'FAST'
+        );
+
+        pdf.save('Lelayu.pdf');
+    } catch(error) {
+    } finally {
+        setDownloadLoading(button,false);
+        downloadBusy = false;
+    }
 }
 </script>
 
