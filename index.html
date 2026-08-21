@@ -309,6 +309,18 @@ body {
     line-height:1.65;
 }
 
+.summary-item-value {
+    min-width:0;
+    white-space:normal;
+    word-break:break-word;
+}
+
+.summary-item-value .summary-line {
+    display:block;
+    margin:0;
+    padding:0;
+}
+
 .example-text {
     color:#dc2626!important;
 }
@@ -665,6 +677,7 @@ body {
 #out-umur,
 #txt-age-suffix {
     font-size:19px;
+    font-weight:800;
 }
 
 #age-section {
@@ -672,16 +685,16 @@ body {
     margin-left:auto;
     margin-right:auto;
     text-align:center;
-    font-weight:700;
+    font-weight:800;
 }
 
 #txt-age-prefix,
 #txt-age-suffix {
-    font-weight:700;
+    font-weight:800;
 }
 
 #out-umur {
-    font-weight:700;
+    font-weight:800;
 }
 
 #txt-burial-title,
@@ -921,6 +934,36 @@ body {
     font-size:10px;
     font-weight:700;
     color:#64748b;
+}
+
+.download-attention {
+    animation:downloadAttention .8s ease-in-out infinite;
+    transform-origin:center;
+}
+
+.download-attention .png-icon,
+.download-attention .pdf-icon {
+    animation:downloadIconAttention .8s ease-in-out infinite;
+}
+
+@keyframes downloadAttention {
+    0%,100% {
+        opacity:1;
+        transform:scale(1);
+    }
+    50% {
+        opacity:.35;
+        transform:scale(1.12);
+    }
+}
+
+@keyframes downloadIconAttention {
+    0%,100% {
+        filter:brightness(1);
+    }
+    50% {
+        filter:brightness(1.45);
+    }
 }
 
 .download-loading {
@@ -1652,7 +1695,6 @@ label {
 
 <div id="finish-popup" style="display:none;">
     <div class="popup-card">
-        <div class="popup-icon">✓</div>
         <h2>Data Selesai</h2>
         <div class="popup-message">Data yang Anda masukkan sudah berhasil diproses.</div>
         <div id="finish-summary" class="finish-summary"></div>
@@ -1662,7 +1704,7 @@ label {
                 <i class="fa-solid fa-heart mr-1"></i> Donasi
             </button>
 
-            <button class="popup-button" onclick="finishAndShowPreview()">Lihat Preview</button>
+            <button class="popup-button" onclick="finishAndShowPreview()">Preview & Unduh</button>
 
             <button class="popup-button secondary full-width" onclick="closeFinishPopup()">Tutup</button>
         </div>
@@ -2013,7 +2055,7 @@ label {
     <div class="floating-controls">
         <div class="floating-card">
 
-            <button class="icon-btn" onclick="downloadPNG(this)" title="Unduh PNG">
+            <button class="icon-btn download-button-png" onclick="downloadPNG(this)" title="Unduh PNG">
                 <svg class="png-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
                     <circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"></circle>
@@ -2021,7 +2063,7 @@ label {
                 </svg>
             </button>
 
-            <button class="icon-btn" onclick="downloadPDF(this)" title="Unduh PDF">
+            <button class="icon-btn download-button-pdf" onclick="downloadPDF(this)" title="Unduh PDF">
                 <svg class="pdf-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 2h9l5 5v15H6a2 2 0 01-2-2V4a2 2 0 012-2z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2v6h6"></path>
@@ -2774,11 +2816,22 @@ function getSummaryValue(id,fallback) {
     return value || fallback;
 }
 
-function buildSummaryItem(label,value) {
+function buildSummaryItem(label,value,preserveLineBreaks) {
+    let valueHTML = exampleHTML(value);
+
+    if (preserveLineBreaks) {
+        valueHTML = valueHTML
+            .split(/\r?\n/)
+            .map(function(line) {
+                return '<span class="summary-line">' + line + '</span>';
+            })
+            .join('');
+    }
+
     return '<div class="summary-item"><div>' +
         escapeHTML(label) +
-        '</div><div>:</div><div>' +
-        exampleHTML(value) +
+        '</div><div>:</div><div class="summary-item-value">' +
+        valueHTML +
         '</div></div>';
 }
 
@@ -2878,7 +2931,8 @@ function buildFinishSummary() {
         if (anak) {
             html += buildSummaryItem(
                 'Anak',
-                anak.replace(/\n/g,' | ')
+                anak,
+                true
             );
         }
     }
@@ -2896,9 +2950,23 @@ function buildFinishSummary() {
     return html;
 }
 
+function startDownloadAttention() {
+    document.querySelectorAll('.download-button-png,.download-button-pdf').forEach(function(button) {
+        button.classList.add('download-attention');
+    });
+}
+
+function stopDownloadAttention() {
+    document.querySelectorAll('.download-button-png,.download-button-pdf').forEach(function(button) {
+        button.classList.remove('download-attention');
+    });
+}
+
 function showFinishPopup() {
     document.getElementById('finish-summary').innerHTML =
         buildFinishSummary();
+
+    startDownloadAttention();
 
     document.getElementById('finish-popup').style.display = 'flex';
 }
@@ -3052,7 +3120,7 @@ function updatePreview() {
     const ageSection = document.getElementById('age-section');
 
     if (ageSection) {
-        ageSection.style.fontWeight = '700';
+        ageSection.style.fontWeight = '800';
     }
 
     const agePrefix = document.getElementById('txt-age-prefix');
@@ -3060,15 +3128,15 @@ function updatePreview() {
     const ageSuffix = document.getElementById('txt-age-suffix');
 
     if (agePrefix) {
-        agePrefix.style.fontWeight = '700';
+        agePrefix.style.fontWeight = '800';
     }
 
     if (ageValue) {
-        ageValue.style.fontWeight = '700';
+        ageValue.style.fontWeight = '800';
     }
 
     if (ageSuffix) {
-        ageSuffix.style.fontWeight = '700';
+        ageSuffix.style.fontWeight = '800';
     }
 
     adjustFontSize();
@@ -3121,7 +3189,7 @@ function setPreviewFontScale(scale) {
     const ageSection = document.getElementById('age-section');
 
     if (ageSection) {
-        ageSection.style.fontWeight = '700';
+        ageSection.style.fontWeight = '800';
     }
 
     const agePrefix = document.getElementById('txt-age-prefix');
@@ -3129,15 +3197,15 @@ function setPreviewFontScale(scale) {
     const ageSuffix = document.getElementById('txt-age-suffix');
 
     if (agePrefix) {
-        agePrefix.style.fontWeight = '700';
+        agePrefix.style.fontWeight = '800';
     }
 
     if (ageValue) {
-        ageValue.style.fontWeight = '700';
+        ageValue.style.fontWeight = '800';
     }
 
     if (ageSuffix) {
-        ageSuffix.style.fontWeight = '700';
+        ageSuffix.style.fontWeight = '800';
     }
 
     document.querySelectorAll('#dyn-content .grid-info').forEach(function(element) {
@@ -3516,6 +3584,45 @@ async function preparePreviewForExport() {
     return true;
 }
 
+function fitExportContent(exportPaper) {
+    const exportDynWrapper =
+        exportPaper.querySelector('#dyn-wrapper');
+
+    const exportDynContent =
+        exportPaper.querySelector('#dyn-content');
+
+    if (!exportDynWrapper || !exportDynContent) {
+        return;
+    }
+
+    exportDynContent.style.transform = 'none';
+    exportDynContent.style.transformOrigin = 'center top';
+
+    const wrapperHeight =
+        exportDynWrapper.getBoundingClientRect().height;
+
+    const contentHeight =
+        exportDynContent.getBoundingClientRect().height;
+
+    if (!wrapperHeight || !contentHeight || contentHeight <= wrapperHeight) {
+        return;
+    }
+
+    let scale = wrapperHeight / contentHeight;
+
+    if (!isFinite(scale) || scale <= 0 || scale >= 1) {
+        return;
+    }
+
+    scale = Math.max(scale * 0.992,0.3);
+
+    exportDynContent.style.transform =
+        'scale(' + scale + ')';
+
+    exportDynContent.style.transformOrigin =
+        'center top';
+}
+
 async function createExportCanvas() {
     await preparePreviewForExport();
 
@@ -3575,13 +3682,15 @@ async function createExportCanvas() {
     if (exportDynContent) {
         exportDynContent.style.overflow = 'visible';
         exportDynContent.style.maxHeight = 'none';
+        exportDynContent.style.transform = 'none';
+        exportDynContent.style.transformOrigin = 'center top';
     }
 
     const exportAgeSection =
         exportPaper.querySelector('#age-section');
 
     if (exportAgeSection) {
-        exportAgeSection.style.fontWeight = '700';
+        exportAgeSection.style.fontWeight = '800';
         exportAgeSection.style.fontStyle = 'normal';
     }
 
@@ -3589,21 +3698,21 @@ async function createExportCanvas() {
         exportPaper.querySelector('#txt-age-prefix');
 
     if (exportAgePrefix) {
-        exportAgePrefix.style.fontWeight = '700';
+        exportAgePrefix.style.fontWeight = '800';
     }
 
     const exportAgeValue =
         exportPaper.querySelector('#out-umur');
 
     if (exportAgeValue) {
-        exportAgeValue.style.fontWeight = '700';
+        exportAgeValue.style.fontWeight = '800';
     }
 
     const exportAgeSuffix =
         exportPaper.querySelector('#txt-age-suffix');
 
     if (exportAgeSuffix) {
-        exportAgeSuffix.style.fontWeight = '700';
+        exportAgeSuffix.style.fontWeight = '800';
     }
 
     const exportBurialTitle =
@@ -3614,6 +3723,34 @@ async function createExportCanvas() {
         exportBurialTitle.style.fontStyle = 'normal';
         exportBurialTitle.style.display = 'block';
         exportBurialTitle.style.fontFamily = "'Plus Jakarta Sans','Inter',sans-serif";
+    }
+
+    const exportFamily =
+        exportPaper.querySelector('#sec-keluarga');
+
+    const exportCondolence =
+        exportPaper.querySelector('#txt-condolence');
+
+    const exportSpouse =
+        exportPaper.querySelector('#sec-pasangan');
+
+    const exportChildrenSection =
+        exportPaper.querySelector('#sec-anak');
+
+    if (exportFamily) {
+        exportFamily.style.gap = '0';
+    }
+
+    if (exportCondolence) {
+        exportCondolence.style.marginBottom = '0';
+    }
+
+    if (exportSpouse) {
+        exportSpouse.style.marginBottom = '0';
+    }
+
+    if (exportChildrenSection) {
+        exportChildrenSection.style.marginBottom = '0';
     }
 
     const exportChildren =
@@ -3656,18 +3793,6 @@ async function createExportCanvas() {
         exportChildren.style.textAlign = 'left';
     }
 
-    const allIds = exportPaper.querySelectorAll('[id]');
-
-    allIds.forEach(function(element) {
-        if (element.id === 'content-area' ||
-            element.id === 'dyn-wrapper' ||
-            element.id === 'dyn-content') {
-            return;
-        }
-
-        element.removeAttribute('id');
-    });
-
     exportStage.appendChild(exportPaper);
 
     await new Promise(function(resolve) {
@@ -3682,6 +3807,26 @@ async function createExportCanvas() {
         } catch(error) {
         }
     }
+
+    fitExportContent(exportPaper);
+
+    await new Promise(function(resolve) {
+        requestAnimationFrame(function() {
+            requestAnimationFrame(resolve);
+        });
+    });
+
+    const allIds = exportPaper.querySelectorAll('[id]');
+
+    allIds.forEach(function(element) {
+        if (element.id === 'content-area' ||
+            element.id === 'dyn-wrapper' ||
+            element.id === 'dyn-content') {
+            return;
+        }
+
+        element.removeAttribute('id');
+    });
 
     const canvas = await html2canvas(
         exportPaper,
@@ -3761,13 +3906,14 @@ async function createExportCanvas() {
                 if (clonedDynContent) {
                     clonedDynContent.style.overflow = 'visible';
                     clonedDynContent.style.maxHeight = 'none';
+                    clonedDynContent.style.transformOrigin = 'center top';
                 }
 
                 const clonedAgeSection =
                     clonedPaper.querySelector('[id="age-section"]');
 
                 if (clonedAgeSection) {
-                    clonedAgeSection.style.fontWeight = '700';
+                    clonedAgeSection.style.fontWeight = '800';
                     clonedAgeSection.style.fontStyle = 'normal';
                 }
 
@@ -3775,21 +3921,21 @@ async function createExportCanvas() {
                     clonedPaper.querySelector('[id="txt-age-prefix"]');
 
                 if (clonedAgePrefix) {
-                    clonedAgePrefix.style.fontWeight = '700';
+                    clonedAgePrefix.style.fontWeight = '800';
                 }
 
                 const clonedAgeValue =
                     clonedPaper.querySelector('[id="out-umur"]');
 
                 if (clonedAgeValue) {
-                    clonedAgeValue.style.fontWeight = '700';
+                    clonedAgeValue.style.fontWeight = '800';
                 }
 
                 const clonedAgeSuffix =
                     clonedPaper.querySelector('[id="txt-age-suffix"]');
 
                 if (clonedAgeSuffix) {
-                    clonedAgeSuffix.style.fontWeight = '700';
+                    clonedAgeSuffix.style.fontWeight = '800';
                 }
 
                 const clonedBurialTitle =
@@ -3800,6 +3946,34 @@ async function createExportCanvas() {
                     clonedBurialTitle.style.fontStyle = 'normal';
                     clonedBurialTitle.style.display = 'block';
                     clonedBurialTitle.style.fontFamily = "'Plus Jakarta Sans','Inter',sans-serif";
+                }
+
+                const clonedCondolence =
+                    clonedPaper.querySelector('[id="txt-condolence"]');
+
+                const clonedSpouse =
+                    clonedPaper.querySelector('[id="sec-pasangan"]');
+
+                const clonedChildrenSection =
+                    clonedPaper.querySelector('[id="sec-anak"]');
+
+                const clonedFamily =
+                    clonedPaper.querySelector('[id="sec-keluarga"]');
+
+                if (clonedFamily) {
+                    clonedFamily.style.gap = '0';
+                }
+
+                if (clonedCondolence) {
+                    clonedCondolence.style.marginBottom = '0';
+                }
+
+                if (clonedSpouse) {
+                    clonedSpouse.style.marginBottom = '0';
+                }
+
+                if (clonedChildrenSection) {
+                    clonedChildrenSection.style.marginBottom = '0';
                 }
 
                 const clonedChildren =
@@ -3835,6 +4009,33 @@ async function createExportCanvas() {
                         clonedChildren.appendChild(childLine);
                     });
                 }
+
+                if (clonedDynWrapper && clonedDynContent) {
+                    const wrapperHeight =
+                        clonedDynWrapper.getBoundingClientRect().height;
+
+                    const contentHeight =
+                        clonedDynContent.getBoundingClientRect().height;
+
+                    if (
+                        wrapperHeight > 0 &&
+                        contentHeight > wrapperHeight
+                    ) {
+                        let scale =
+                            wrapperHeight / contentHeight;
+
+                        scale = Math.max(
+                            Math.min(scale * 0.992,1),
+                            0.3
+                        );
+
+                        clonedDynContent.style.transform =
+                            'scale(' + scale + ')';
+
+                        clonedDynContent.style.transformOrigin =
+                            'center top';
+                    }
+                }
             }
         }
     );
@@ -3848,6 +4049,7 @@ function setDownloadLoading(button,loading) {
     if (!button) return;
 
     if (loading) {
+        stopDownloadAttention();
         button.classList.add('download-loading');
         button.setAttribute('aria-busy','true');
         button.disabled = true;
@@ -3866,6 +4068,8 @@ let downloadBusy = false;
 
 async function downloadPNG(button) {
     if (downloadBusy) return;
+
+    stopDownloadAttention();
 
     downloadBusy = true;
     setDownloadLoading(button,true);
@@ -3895,6 +4099,8 @@ async function downloadPNG(button) {
 
 async function downloadPDF(button) {
     if (downloadBusy) return;
+
+    stopDownloadAttention();
 
     downloadBusy = true;
     setDownloadLoading(button,true);
