@@ -1563,18 +1563,25 @@ label {
     }
 
     .mobile-preview-header {
+        left:6px;
+        right:6px;
+        top:8px;
+        padding:8px 50px 8px 14px;
+        min-height:50px;
         justify-content:center;
     }
 
     .mobile-preview-title {
         width:100%;
         text-align:center;
+        padding:0 6px;
     }
 
     .mobile-preview-close {
         position:absolute;
         right:8px;
-        top:8px;
+        top:50%;
+        transform:translateY(-50%);
         background:#dc2626;
         border:1px solid #dc2626;
         color:#fff;
@@ -1591,6 +1598,7 @@ label {
         background:#b91c1c;
         border-color:#b91c1c;
         color:#fff;
+        transform:translateY(-50%);
     }
 
     .mobile-preview-card #preview-container {
@@ -1768,7 +1776,7 @@ label {
 <div id="mobile-preview-modal">
     <div class="mobile-preview-card">
         <div class="mobile-preview-header">
-            <div class="mobile-preview-title">Preview Lelayu</div>
+            <div class="mobile-preview-title">PREVIEW LELAYU</div>
             <button class="mobile-preview-close" onclick="closeMobilePreview()">×</button>
         </div>
         <div id="mobile-preview-content" class="mobile-preview-content"></div>
@@ -1783,7 +1791,7 @@ label {
 
     <div class="sidebar-header">
         FORM LELAYU
-        <a class="sidebar-whatsapp" href="https://wa.me/6282323624177" target="_blank" rel="noopener noreferrer">Tri Wantoro | Tewe Tech</a>
+        <a class="sidebar-whatsapp" href="https://wa.me/6282323624177" target="_blank" rel="noopener noreferrer">Tri Wantoro | Tewe Tech | Version 4.9</a>
     </div>
 
     <div id="step-info" class="step-indicator">
