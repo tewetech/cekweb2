@@ -459,6 +459,10 @@ body {
     color:#475569;
     font-size:20px;
     cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    line-height:1;
 }
 
 .mobile-preview-content {
@@ -1556,6 +1560,37 @@ label {
 
     #mobile-preview-modal {
         padding:8px;
+    }
+
+    .mobile-preview-header {
+        justify-content:center;
+    }
+
+    .mobile-preview-title {
+        width:100%;
+        text-align:center;
+    }
+
+    .mobile-preview-close {
+        position:absolute;
+        right:8px;
+        top:8px;
+        background:#dc2626;
+        border:1px solid #dc2626;
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        line-height:1;
+        font-size:20px;
+        font-weight:700;
+    }
+
+    .mobile-preview-close:hover {
+        background:#b91c1c;
+        border-color:#b91c1c;
+        color:#fff;
     }
 
     .mobile-preview-card #preview-container {
