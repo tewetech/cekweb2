@@ -202,6 +202,7 @@ body {
 
 .popup-button {
     width:100%;
+    min-height:42px;
     border:0;
     border-radius:12px;
     padding:11px 16px;
@@ -212,6 +213,10 @@ body {
     font-weight:700;
     cursor:pointer;
     transition:all .2s ease;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 .popup-button:hover {
@@ -675,6 +680,10 @@ body {
     font-weight:700;
 }
 
+#out-umur {
+    font-weight:700;
+}
+
 #txt-burial-title,
 #txt-closing1 {
     font-size:19px;
@@ -686,7 +695,8 @@ body {
     margin-left:auto;
     margin-right:auto;
     text-align:center;
-    font-weight:800;
+    font-weight:800!important;
+    font-style:normal;
 }
 
 #txt-outro {
@@ -930,11 +940,30 @@ body {
     border-top-color:transparent;
     border-radius:50%;
     animation:downloadSpin .7s linear infinite;
+    display:block;
+    flex:0 0 auto;
+}
+
+.popup-button.download-loading {
+    min-height:42px;
+    color:#fff;
+    pointer-events:none!important;
+    opacity:.8;
+}
+
+.popup-button.download-loading > * {
+    display:none!important;
 }
 
 .popup-button.download-loading::after {
-    width:17px;
-    height:17px;
+    width:18px;
+    height:18px;
+    border:2px solid currentColor;
+    border-top-color:transparent;
+    border-radius:50%;
+    animation:downloadSpin .7s linear infinite;
+    display:block;
+    flex:0 0 auto;
 }
 
 @keyframes downloadSpin {
@@ -1360,6 +1389,18 @@ label {
     top:-10px;
 }
 
+#export-stage {
+    position:fixed;
+    left:-100000px;
+    top:0;
+    width:794px;
+    height:1123px;
+    overflow:hidden;
+    pointer-events:none;
+    opacity:1;
+    z-index:-1;
+}
+
 @media(max-width:767px) {
     html,
     body {
@@ -1623,14 +1664,6 @@ label {
 
             <button class="popup-button" onclick="finishAndShowPreview()">Lihat Preview</button>
 
-            <button id="finish-download-png" class="popup-button download-png" onclick="downloadPNG(this)">
-                <i class="fa-solid fa-image mr-1"></i> Unduh PNG
-            </button>
-
-            <button id="finish-download-pdf" class="popup-button download-pdf" onclick="downloadPDF(this)">
-                <i class="fa-solid fa-file-pdf mr-1"></i> Unduh PDF
-            </button>
-
             <button class="popup-button secondary full-width" onclick="closeFinishPopup()">Tutup</button>
         </div>
     </div>
@@ -1666,6 +1699,8 @@ label {
 </div>
 
 <img id="download-preload" src="https://raw.githubusercontent.com/tewetech/aset/main/Full%20Aset%20(Final)/Gambar/Frame%20Lelayu.png" crossorigin="anonymous" alt="">
+
+<div id="export-stage"></div>
 
 <div class="w-full md:w-80 bg-white flex flex-col h-full z-10 border-r border-gray-100" id="sidebar">
 
@@ -2018,6 +2053,7 @@ const FRAME_URL = 'https://raw.githubusercontent.com/tewetech/aset/main/Full%20A
 
 let frameImageReady = false;
 let frameImagePromise = null;
+let frameDataURL = '';
 
 function preloadFrameImage() {
     if (frameImagePromise) {
@@ -2028,13 +2064,28 @@ function preloadFrameImage() {
         const image = new Image();
         image.crossOrigin = 'anonymous';
 
-        image.onload = function() {
+        image.onload = async function() {
             frameImageReady = true;
+
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = image.naturalWidth || 794;
+                canvas.height = image.naturalHeight || 1123;
+
+                const context = canvas.getContext('2d');
+                context.drawImage(image,0,0);
+
+                frameDataURL = canvas.toDataURL('image/png');
+            } catch(error) {
+                frameDataURL = '';
+            }
+
             resolve(image);
         };
 
         image.onerror = function() {
             frameImageReady = false;
+            frameDataURL = '';
             resolve(null);
         };
 
@@ -2209,6 +2260,8 @@ function applyDictionary() {
     document.getElementById('lbl-mati-3').innerText = d.dm3;
     document.getElementById('lbl-mati-4').innerText = d.dm4;
     document.getElementById('txt-burial-title').innerText = d.bt;
+    document.getElementById('txt-burial-title').style.fontWeight = '800';
+    document.getElementById('txt-burial-title').style.fontStyle = 'normal';
     document.getElementById('lbl-makam-1').innerText = d.bm1;
     document.getElementById('lbl-makam-2').innerText = d.bm2;
     document.getElementById('lbl-makam-3').innerText = d.bm3;
@@ -2989,6 +3042,35 @@ function updatePreview() {
     document.getElementById('out-cucu').innerHTML =
         exampleHTML(getGrandchildrenText());
 
+    const burialTitle = document.getElementById('txt-burial-title');
+
+    if (burialTitle) {
+        burialTitle.style.fontWeight = '800';
+        burialTitle.style.fontStyle = 'normal';
+    }
+
+    const ageSection = document.getElementById('age-section');
+
+    if (ageSection) {
+        ageSection.style.fontWeight = '700';
+    }
+
+    const agePrefix = document.getElementById('txt-age-prefix');
+    const ageValue = document.getElementById('out-umur');
+    const ageSuffix = document.getElementById('txt-age-suffix');
+
+    if (agePrefix) {
+        agePrefix.style.fontWeight = '700';
+    }
+
+    if (ageValue) {
+        ageValue.style.fontWeight = '700';
+    }
+
+    if (ageSuffix) {
+        ageSuffix.style.fontWeight = '700';
+    }
+
     adjustFontSize();
 }
 
@@ -3028,6 +3110,35 @@ function setPreviewFontScale(scale) {
         element.style.fontSize =
             Math.max(item[1] * scale,8) + 'px';
     });
+
+    const burialTitle = document.getElementById('txt-burial-title');
+
+    if (burialTitle) {
+        burialTitle.style.fontWeight = '800';
+        burialTitle.style.fontStyle = 'normal';
+    }
+
+    const ageSection = document.getElementById('age-section');
+
+    if (ageSection) {
+        ageSection.style.fontWeight = '700';
+    }
+
+    const agePrefix = document.getElementById('txt-age-prefix');
+    const ageValue = document.getElementById('out-umur');
+    const ageSuffix = document.getElementById('txt-age-suffix');
+
+    if (agePrefix) {
+        agePrefix.style.fontWeight = '700';
+    }
+
+    if (ageValue) {
+        ageValue.style.fontWeight = '700';
+    }
+
+    if (ageSuffix) {
+        ageSuffix.style.fontWeight = '700';
+    }
 
     document.querySelectorAll('#dyn-content .grid-info').forEach(function(element) {
         element.style.fontSize =
@@ -3402,17 +3513,162 @@ async function preparePreviewForExport() {
         });
     });
 
-    const paper = document.getElementById('paper');
+    return true;
+}
 
-    const oldTransform = paper.style.transform;
-    const oldPosition = paper.style.position;
-    const oldLeft = paper.style.left;
-    const oldTop = paper.style.top;
+async function createExportCanvas() {
+    await preparePreviewForExport();
 
-    paper.style.transform = 'none';
-    paper.style.position = 'relative';
-    paper.style.left = '0';
-    paper.style.top = '0';
+    const originalPaper = document.getElementById('paper');
+    const exportStage = document.getElementById('export-stage');
+
+    exportStage.innerHTML = '';
+
+    const exportPaper = originalPaper.cloneNode(true);
+
+    exportPaper.removeAttribute('id');
+    exportPaper.style.width = '794px';
+    exportPaper.style.height = '1123px';
+    exportPaper.style.minWidth = '794px';
+    exportPaper.style.minHeight = '1123px';
+    exportPaper.style.maxWidth = '794px';
+    exportPaper.style.maxHeight = '1123px';
+    exportPaper.style.position = 'relative';
+    exportPaper.style.left = '0';
+    exportPaper.style.top = '0';
+    exportPaper.style.transform = 'none';
+    exportPaper.style.transformOrigin = 'top left';
+    exportPaper.style.margin = '0';
+    exportPaper.style.padding = '58px 58px';
+    exportPaper.style.overflow = 'hidden';
+    exportPaper.style.boxSizing = 'border-box';
+    exportPaper.style.backgroundColor = '#ffffff';
+    exportPaper.style.backgroundImage = frameDataURL
+        ? 'url("' + frameDataURL + '")'
+        : 'url("' + FRAME_URL + '")';
+    exportPaper.style.backgroundSize = '100% 100%';
+    exportPaper.style.backgroundPosition = 'center';
+    exportPaper.style.backgroundRepeat = 'no-repeat';
+
+    const exportContentArea =
+        exportPaper.querySelector('#content-area');
+
+    if (exportContentArea) {
+        exportContentArea.style.width = '100%';
+        exportContentArea.style.height = '100%';
+        exportContentArea.style.minHeight = '0';
+        exportContentArea.style.paddingBottom = '36px';
+        exportContentArea.style.overflow = 'visible';
+    }
+
+    const exportDynWrapper =
+        exportPaper.querySelector('#dyn-wrapper');
+
+    if (exportDynWrapper) {
+        exportDynWrapper.style.overflow = 'visible';
+        exportDynWrapper.style.minHeight = '0';
+    }
+
+    const exportDynContent =
+        exportPaper.querySelector('#dyn-content');
+
+    if (exportDynContent) {
+        exportDynContent.style.overflow = 'visible';
+        exportDynContent.style.maxHeight = 'none';
+    }
+
+    const exportAgeSection =
+        exportPaper.querySelector('#age-section');
+
+    if (exportAgeSection) {
+        exportAgeSection.style.fontWeight = '700';
+        exportAgeSection.style.fontStyle = 'normal';
+    }
+
+    const exportAgePrefix =
+        exportPaper.querySelector('#txt-age-prefix');
+
+    if (exportAgePrefix) {
+        exportAgePrefix.style.fontWeight = '700';
+    }
+
+    const exportAgeValue =
+        exportPaper.querySelector('#out-umur');
+
+    if (exportAgeValue) {
+        exportAgeValue.style.fontWeight = '700';
+    }
+
+    const exportAgeSuffix =
+        exportPaper.querySelector('#txt-age-suffix');
+
+    if (exportAgeSuffix) {
+        exportAgeSuffix.style.fontWeight = '700';
+    }
+
+    const exportBurialTitle =
+        exportPaper.querySelector('#txt-burial-title');
+
+    if (exportBurialTitle) {
+        exportBurialTitle.style.fontWeight = '800';
+        exportBurialTitle.style.fontStyle = 'normal';
+        exportBurialTitle.style.display = 'block';
+        exportBurialTitle.style.fontFamily = "'Plus Jakarta Sans','Inter',sans-serif";
+    }
+
+    const exportChildren =
+        exportPaper.querySelector('#out-anak');
+
+    if (exportChildren) {
+        const childrenText =
+            exportChildren.textContent || '';
+
+        const childrenLines =
+            childrenText
+                .split(/\r?\n/)
+                .map(function(line) {
+                    return line.trim();
+                })
+                .filter(function(line) {
+                    return line !== '';
+                });
+
+        exportChildren.innerHTML = '';
+
+        childrenLines.forEach(function(line,index) {
+            const childLine = document.createElement('div');
+
+            childLine.style.display = 'block';
+            childLine.style.width = '100%';
+            childLine.style.whiteSpace = 'nowrap';
+            childLine.textContent = line;
+
+            exportChildren.appendChild(childLine);
+
+            if (index < childrenLines.length - 1) {
+                childLine.style.marginBottom = '0';
+            }
+        });
+
+        exportChildren.style.display = 'block';
+        exportChildren.style.width = '100%';
+        exportChildren.style.whiteSpace = 'normal';
+        exportChildren.style.textAlign = 'left';
+    }
+
+    const allIds = exportPaper.querySelectorAll('[id]');
+
+    allIds.forEach(function(element) {
+        if (element.id === 'content-area' ||
+            element.id === 'dyn-wrapper' ||
+            element.id === 'dyn-content') {
+            return;
+        }
+
+        element.removeAttribute('id');
+    });
+
+    exportStage.appendChild(exportPaper);
 
     await new Promise(function(resolve) {
         requestAnimationFrame(function() {
@@ -3420,98 +3676,172 @@ async function preparePreviewForExport() {
         });
     });
 
-    return function() {
-        paper.style.transform = oldTransform;
-        paper.style.position = oldPosition;
-        paper.style.left = oldLeft;
-        paper.style.top = oldTop;
-    };
-}
+    if (document.fonts && document.fonts.ready) {
+        try {
+            await document.fonts.ready;
+        } catch(error) {
+        }
+    }
 
-async function createExportCanvas() {
-    const restorePreview = await preparePreviewForExport();
-    const paper = document.getElementById('paper');
+    const canvas = await html2canvas(
+        exportPaper,
+        {
+            scale:3,
+            useCORS:true,
+            allowTaint:false,
+            backgroundColor:'#ffffff',
+            width:794,
+            height:1123,
+            windowWidth:794,
+            windowHeight:1123,
+            scrollX:0,
+            scrollY:0,
+            x:0,
+            y:0,
+            logging:false,
+            imageTimeout:30000,
+            removeContainer:true,
+            foreignObjectRendering:false,
+            onclone:function(clonedDocument) {
+                const clonedPaper =
+                    clonedDocument.querySelector('[style*="width: 794px"]');
 
-    try {
-        const canvas = await html2canvas(
-            paper,
-            {
-                scale:3,
-                useCORS:true,
-                allowTaint:false,
-                backgroundColor:'#ffffff',
-                width:794,
-                height:1123,
-                windowWidth:794,
-                windowHeight:1123,
-                scrollX:0,
-                scrollY:0,
-                x:0,
-                y:0,
-                logging:false,
-                imageTimeout:30000,
-                removeContainer:true,
-                foreignObjectRendering:false,
-                onclone:function(clonedDocument) {
-                    const clonedPaper =
-                        clonedDocument.getElementById('paper');
+                if (!clonedPaper) return;
 
-                    if (!clonedPaper) return;
+                clonedPaper.style.position = 'relative';
+                clonedPaper.style.left = '0';
+                clonedPaper.style.top = '0';
+                clonedPaper.style.transform = 'none';
+                clonedPaper.style.transformOrigin = 'top left';
+                clonedPaper.style.width = '794px';
+                clonedPaper.style.height = '1123px';
+                clonedPaper.style.minWidth = '794px';
+                clonedPaper.style.minHeight = '1123px';
+                clonedPaper.style.maxWidth = '794px';
+                clonedPaper.style.maxHeight = '1123px';
+                clonedPaper.style.padding = '58px 58px';
+                clonedPaper.style.overflow = 'hidden';
+                clonedPaper.style.boxSizing = 'border-box';
+                clonedPaper.style.backgroundColor = '#ffffff';
 
-                    clonedPaper.style.position = 'relative';
-                    clonedPaper.style.left = '0';
-                    clonedPaper.style.top = '0';
-                    clonedPaper.style.transform = 'none';
-                    clonedPaper.style.transformOrigin = 'top left';
-                    clonedPaper.style.width = '794px';
-                    clonedPaper.style.height = '1123px';
-                    clonedPaper.style.minWidth = '794px';
-                    clonedPaper.style.minHeight = '1123px';
-                    clonedPaper.style.maxWidth = '794px';
-                    clonedPaper.style.maxHeight = '1123px';
-                    clonedPaper.style.padding = '58px 58px';
-                    clonedPaper.style.overflow = 'hidden';
-                    clonedPaper.style.boxSizing = 'border-box';
+                if (frameDataURL) {
+                    clonedPaper.style.backgroundImage =
+                        'url("' + frameDataURL + '")';
+                } else {
                     clonedPaper.style.backgroundImage =
                         'url("' + FRAME_URL + '")';
-                    clonedPaper.style.backgroundSize = '100% 100%';
-                    clonedPaper.style.backgroundPosition = 'center';
-                    clonedPaper.style.backgroundRepeat = 'no-repeat';
+                }
 
-                    const clonedContent =
-                        clonedDocument.getElementById('content-area');
+                clonedPaper.style.backgroundSize = '100% 100%';
+                clonedPaper.style.backgroundPosition = 'center';
+                clonedPaper.style.backgroundRepeat = 'no-repeat';
 
-                    const clonedDynWrapper =
-                        clonedDocument.getElementById('dyn-wrapper');
+                const clonedContent =
+                    clonedPaper.querySelector('#content-area');
 
-                    const clonedDynContent =
-                        clonedDocument.getElementById('dyn-content');
+                const clonedDynWrapper =
+                    clonedPaper.querySelector('#dyn-wrapper');
 
-                    if (clonedContent) {
-                        clonedContent.style.width = '100%';
-                        clonedContent.style.height = '100%';
-                        clonedContent.style.minHeight = '0';
-                        clonedContent.style.paddingBottom = '36px';
-                        clonedContent.style.overflow = 'visible';
-                    }
+                const clonedDynContent =
+                    clonedPaper.querySelector('#dyn-content');
 
-                    if (clonedDynWrapper) {
-                        clonedDynWrapper.style.overflow = 'visible';
-                        clonedDynWrapper.style.minHeight = '0';
-                    }
+                if (clonedContent) {
+                    clonedContent.style.width = '100%';
+                    clonedContent.style.height = '100%';
+                    clonedContent.style.minHeight = '0';
+                    clonedContent.style.paddingBottom = '36px';
+                    clonedContent.style.overflow = 'visible';
+                }
 
-                    if (clonedDynContent) {
-                        clonedDynContent.style.overflow = 'visible';
-                        clonedDynContent.style.maxHeight = 'none';
-                    }
+                if (clonedDynWrapper) {
+                    clonedDynWrapper.style.overflow = 'visible';
+                    clonedDynWrapper.style.minHeight = '0';
+                }
+
+                if (clonedDynContent) {
+                    clonedDynContent.style.overflow = 'visible';
+                    clonedDynContent.style.maxHeight = 'none';
+                }
+
+                const clonedAgeSection =
+                    clonedPaper.querySelector('[id="age-section"]');
+
+                if (clonedAgeSection) {
+                    clonedAgeSection.style.fontWeight = '700';
+                    clonedAgeSection.style.fontStyle = 'normal';
+                }
+
+                const clonedAgePrefix =
+                    clonedPaper.querySelector('[id="txt-age-prefix"]');
+
+                if (clonedAgePrefix) {
+                    clonedAgePrefix.style.fontWeight = '700';
+                }
+
+                const clonedAgeValue =
+                    clonedPaper.querySelector('[id="out-umur"]');
+
+                if (clonedAgeValue) {
+                    clonedAgeValue.style.fontWeight = '700';
+                }
+
+                const clonedAgeSuffix =
+                    clonedPaper.querySelector('[id="txt-age-suffix"]');
+
+                if (clonedAgeSuffix) {
+                    clonedAgeSuffix.style.fontWeight = '700';
+                }
+
+                const clonedBurialTitle =
+                    clonedPaper.querySelector('[id="txt-burial-title"]');
+
+                if (clonedBurialTitle) {
+                    clonedBurialTitle.style.fontWeight = '800';
+                    clonedBurialTitle.style.fontStyle = 'normal';
+                    clonedBurialTitle.style.display = 'block';
+                    clonedBurialTitle.style.fontFamily = "'Plus Jakarta Sans','Inter',sans-serif";
+                }
+
+                const clonedChildren =
+                    clonedPaper.querySelector('[id="out-anak"]');
+
+                if (clonedChildren) {
+                    clonedChildren.style.display = 'block';
+                    clonedChildren.style.width = '100%';
+                    clonedChildren.style.whiteSpace = 'normal';
+                    clonedChildren.style.textAlign = 'left';
+
+                    const childrenLines =
+                        (clonedChildren.textContent || '')
+                            .split(/\r?\n/)
+                            .map(function(line) {
+                                return line.trim();
+                            })
+                            .filter(function(line) {
+                                return line !== '';
+                            });
+
+                    clonedChildren.innerHTML = '';
+
+                    childrenLines.forEach(function(line) {
+                        const childLine =
+                            clonedDocument.createElement('div');
+
+                        childLine.style.display = 'block';
+                        childLine.style.width = '100%';
+                        childLine.style.whiteSpace = 'nowrap';
+                        childLine.textContent = line;
+
+                        clonedChildren.appendChild(childLine);
+                    });
                 }
             }
-        );
+        }
+    );
 
-        return canvas;
-    } finally {
-        restorePreview();
-    }
+    exportStage.innerHTML = '';
+
+    return canvas;
 }
 
 function setDownloadLoading(button,loading) {
@@ -3520,10 +3850,13 @@ function setDownloadLoading(button,loading) {
     if (loading) {
         button.classList.add('download-loading');
         button.setAttribute('aria-busy','true');
+        button.disabled = true;
         button.dataset.originalPointer = button.style.pointerEvents;
+        button.dataset.originalContents = button.innerHTML;
     } else {
         button.classList.remove('download-loading');
         button.removeAttribute('aria-busy');
+        button.disabled = false;
         button.style.pointerEvents =
             button.dataset.originalPointer || '';
     }
@@ -3554,6 +3887,7 @@ async function downloadPNG(button) {
         link.remove();
     } catch(error) {
     } finally {
+        document.getElementById('export-stage').innerHTML = '';
         setDownloadLoading(button,false);
         downloadBusy = false;
     }
@@ -3598,6 +3932,7 @@ async function downloadPDF(button) {
         pdf.save('Lelayu.pdf');
     } catch(error) {
     } finally {
+        document.getElementById('export-stage').innerHTML = '';
         setDownloadLoading(button,false);
         downloadBusy = false;
     }
