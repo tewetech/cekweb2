@@ -58,6 +58,7 @@ body {
 }
 
 #lang-modal,
+#deceased-type-modal,
 #custom-popup,
 #finish-popup,
 #donation-popup,
@@ -72,6 +73,10 @@ body {
     align-items:center;
     justify-content:center;
     padding:20px;
+}
+
+#deceased-type-modal {
+    z-index:10500;
 }
 
 #donation-popup {
@@ -172,6 +177,54 @@ body {
 
 .lang-card button:last-child:hover {
     background:#ccfbf1!important;
+}
+
+.deceased-type-subtitle {
+    width:min(330px,100%);
+    margin:9px auto 20px;
+    color:#64748b;
+    font-size:12px;
+    line-height:1.6;
+}
+
+.deceased-type-actions {
+    display:grid;
+    gap:10px;
+    margin-top:16px;
+}
+
+.deceased-type-button {
+    width:100%;
+    min-height:48px;
+    padding:12px 16px;
+    border-radius:13px;
+    border:1px solid #0f766e;
+    background:#0f766e;
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+.deceased-type-button:hover {
+    background:#115e59;
+    border-color:#115e59;
+    color:#fff;
+    transform:translateY(-1px);
+}
+
+.deceased-type-button.primary {
+    background:#0f766e;
+    border-color:#0f766e;
+    color:#fff;
+}
+
+.deceased-type-button.primary:hover {
+    background:#115e59;
+    border-color:#115e59;
+    color:#fff;
 }
 
 .popup-icon {
@@ -536,7 +589,15 @@ body {
     display:flex;
     flex-direction:column;
     padding:58px 58px;
-    color:black;
+    color:#000000;
+}
+
+#paper * {
+    color:#000000!important;
+}
+
+#paper .example-text {
+    color:#dc2626!important;
 }
 
 #content-area {
@@ -757,7 +818,9 @@ body {
 }
 
 #out-pasangan,
+#out-orang-tua,
 #out-anak,
+#out-saudara,
 #out-cucu {
     font-size:18px;
     line-height:1.28;
@@ -779,12 +842,20 @@ body {
     order:2;
 }
 
-#sec-anak {
+#sec-orang-tua {
     order:3;
 }
 
-#sec-cucu {
+#sec-anak {
     order:4;
+}
+
+#sec-saudara {
+    order:5;
+}
+
+#sec-cucu {
+    order:6;
 }
 
 #dyn-wrapper {
@@ -1467,7 +1538,9 @@ label {
 }
 
 #out-anak,
-#out-cucu {
+#out-saudara,
+#out-cucu,
+#out-orang-tua {
     white-space:pre-line;
     text-align:left;
     width:100%;
@@ -1744,6 +1817,15 @@ label {
     .lang-subtitle {
         margin-bottom:21px;
     }
+
+    .deceased-type-subtitle {
+        margin-bottom:18px;
+    }
+
+    .deceased-type-button {
+        min-height:46px;
+        font-size:12px;
+    }
 }
 
 @media(min-width:768px) {
@@ -1794,6 +1876,27 @@ label {
         <div class="flex gap-4 justify-center">
             <button onclick="setLanguage('id')">Indonesia</button>
             <button onclick="setLanguage('jv')">Jawa</button>
+        </div>
+    </div>
+</div>
+
+<div id="deceased-type-modal" style="display:none;">
+    <div class="popup-card">
+        <div class="popup-icon">
+            <i class="fa-solid fa-user"></i>
+        </div>
+        <h2>Siapa Yang Meninggal?</h2>
+        <div class="deceased-type-subtitle">
+        </div>
+
+        <div class="deceased-type-actions">
+            <button class="deceased-type-button primary" onclick="setDeceasedType('elder')">
+                Eyang (Simbah) atau Orang Tua
+            </button>
+
+            <button class="deceased-type-button" onclick="setDeceasedType('child')">
+                Anak-Anak
+            </button>
         </div>
     </div>
 </div>
@@ -1864,7 +1967,7 @@ label {
 
     <div class="sidebar-header">
         FORM LELAYU
-        <a class="sidebar-whatsapp" href="https://wa.me/6282323624177" target="_blank" rel="noopener noreferrer">Tri Wantoro | Tewe Tech | Version 5.1</a>
+        <a class="sidebar-whatsapp" href="https://wa.me/6282323624177" target="_blank" rel="noopener noreferrer">Tri Wantoro | Tewe Tech | Version 5.5</a>
     </div>
 
     <div id="step-info" class="step-indicator">
@@ -2014,18 +2117,18 @@ label {
                 <span>TURUT BERDUKA CITA</span>
             </div>
 
-            <div class="p-2 border rounded mb-2 bg-gray-50">
+            <div class="p-2 border rounded mb-2 bg-gray-50" id="family-spouse">
                 <div class="checkbox-wrap">
                     <input type="checkbox" id="check-pasangan" checked onchange="updatePreview()">
-                    <label for="check-pasangan">Tampilkan Suami / Istri</label>
+                    <label for="check-pasangan" id="label-pasangan-toggle">Tampilkan Suami / Istri</label>
                 </div>
 
                 <div class="radio-group">
-                    <label class="radio-option">
+                    <label class="radio-option" id="spouse-option-suami">
                         <input type="radio" name="pasangan" value="suami" onchange="updatePreview()">
                         <span>Suami</span>
                     </label>
-                    <label class="radio-option">
+                    <label class="radio-option" id="spouse-option-istri">
                         <input type="radio" name="pasangan" value="istri" onchange="updatePreview()">
                         <span>Istri</span>
                     </label>
@@ -2034,7 +2137,16 @@ label {
                 <input type="text" id="in-pasangan" placeholder="" oninput="updatePreview()">
             </div>
 
-            <div class="p-2 border rounded mb-2 bg-gray-50">
+            <div class="p-2 border rounded mb-2 bg-gray-50" id="family-parents">
+                <div class="checkbox-wrap">
+                    <input type="checkbox" id="check-orang-tua" onchange="updatePreview()">
+                    <label for="check-orang-tua">Tampilkan Orang Tua</label>
+                </div>
+
+                <input type="text" id="in-orang-tua" placeholder="Contoh: Sumarno - Sulastri" oninput="updatePreview()">
+            </div>
+
+            <div class="p-2 border rounded mb-2 bg-gray-50" id="family-children">
                 <div class="checkbox-wrap">
                     <input type="checkbox" id="check-anak" checked onchange="updatePreview()">
                     <label for="check-anak">Tampilkan Anak</label>
@@ -2047,7 +2159,20 @@ label {
                 </div>
             </div>
 
-            <div class="p-2 border rounded bg-gray-50">
+            <div class="p-2 border rounded mb-2 bg-gray-50" id="family-siblings">
+                <div class="checkbox-wrap">
+                    <input type="checkbox" id="check-saudara" onchange="updatePreview()">
+                    <label for="check-saudara">Tampilkan Saudara Kandung</label>
+                </div>
+
+                <div id="siblings-list" class="children-list"></div>
+
+                <div class="children-note">
+                    Masukkan nama saudara satu per satu. Gunakan + untuk menambah dan × untuk menghapus.
+                </div>
+            </div>
+
+            <div class="p-2 border rounded bg-gray-50" id="family-grandchildren">
                 <div class="checkbox-wrap">
                     <input type="checkbox" id="check-cucu" checked onchange="updatePreview()">
                     <label for="check-cucu">Tampilkan Cucu</label>
@@ -2145,9 +2270,19 @@ label {
                                     <div id="out-pasangan"></div>
                                 </div>
 
+                                <div id="sec-orang-tua" class="keluarga-list">
+                                    <div id="lbl-orang-tua" class="keluarga-heading"></div>
+                                    <div id="out-orang-tua"></div>
+                                </div>
+
                                 <div id="sec-anak" class="keluarga-list">
                                     <div id="lbl-anak" class="keluarga-heading"></div>
                                     <div id="out-anak"></div>
+                                </div>
+
+                                <div id="sec-saudara" class="keluarga-list">
+                                    <div id="lbl-saudara" class="keluarga-heading"></div>
+                                    <div id="out-saudara"></div>
                                 </div>
 
                                 <div id="sec-cucu" class="keluarga-list">
@@ -2168,6 +2303,14 @@ label {
 
             <button id="toggle-354-button" class="toggle-354-btn" onclick="toggle354()" title="Tampilkan / Sembunyikan 354">354</button>
 
+            <button class="icon-btn lang-icon-btn" onclick="toggleLanguage()" title="Ganti Bahasa">
+                <i class="fa-solid fa-language"></i>
+            </button>
+
+            <button class="icon-btn donation-icon-btn" onclick="showDonationPopup()" title="Donasi">
+                <i class="fa-solid fa-heart"></i>
+            </button>
+
             <button class="icon-btn download-button-png" onclick="downloadPNG(this)" title="Unduh PNG">
                 <svg class="png-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2"></rect>
@@ -2182,14 +2325,6 @@ label {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2v6h6"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 17h1.5a1.5 1.5 0 000-3H8v5m5 0v-5h1.3a2.5 2.5 0 010 5H13m-5-2h2m2 2h1"></path>
                 </svg>
-            </button>
-
-            <button class="icon-btn donation-icon-btn" onclick="showDonationPopup()" title="Donasi">
-                <i class="fa-solid fa-heart"></i>
-            </button>
-
-            <button class="icon-btn lang-icon-btn" onclick="toggleLanguage()" title="Ganti Bahasa">
-                <i class="fa-solid fa-language"></i>
             </button>
 
             <div class="control-divider"></div>
@@ -2272,7 +2407,9 @@ const dict = {
         cd:"Keluarga yang sedang berduka",
         spouseSuami:"Suami",
         spouseIstri:"Istri ",
+        orangTua:"Orang Tua",
         anak:"Anak ",
+        saudara:"Saudara Kandung",
         cucu:"Cucu ",
         causeSakit:"sakit",
         causeUsia:"usia"
@@ -2298,7 +2435,9 @@ const dict = {
         cd:"Ingkang nandhang dhukito",
         spouseSuami:"Garwa Kakung",
         spouseIstri:"Garwa Estri",
+        orangTua:"Wong Tua",
         anak:"Putro",
+        saudara:"Sedulur Kandung",
         cucu:"Wayah",
         causeSakit:"gerah",
         causeUsia:"sepuh"
@@ -2313,6 +2452,7 @@ let basePreviewScale = 1;
 const minZoom = 0.5;
 const maxZoom = 3;
 const zoomStep = 0.1;
+let deceasedType = '';
 
 const defaultData = {
     nama:"Wongso Pawiro Kusumo (contoh)",
@@ -2333,6 +2473,10 @@ const defaultData = {
 let childrenData = [
     "Rohman S - Annisa Rahma (contoh)",
     "Rendy Wibawa (contoh)"
+];
+
+let siblingsData = [
+    ""
 ];
 
 let grandchildrenData = 1;
@@ -2389,6 +2533,123 @@ function setLanguage(lang) {
     document.getElementById('lang-modal').style.display = 'none';
     applyDictionary();
     updatePreview();
+    showDeceasedTypePopup();
+}
+
+function showDeceasedTypePopup() {
+    document.getElementById('deceased-type-modal').style.display = 'flex';
+}
+
+function setDeceasedType(type) {
+    deceasedType = type;
+    document.getElementById('deceased-type-modal').style.display = 'none';
+    applyDeceasedTypeLayout(true);
+    updatePreview();
+}
+
+function updateSpouseOptionsByGender() {
+    const toggleLabel = document.getElementById('label-pasangan-toggle');
+    const suamiOption = document.getElementById('spouse-option-suami');
+    const istriOption = document.getElementById('spouse-option-istri');
+    const suamiRadio = document.querySelector('input[name="pasangan"][value="suami"]');
+    const istriRadio = document.querySelector('input[name="pasangan"][value="istri"]');
+    const gender = document.querySelector('input[name="gender"]:checked');
+
+    if (
+        !toggleLabel ||
+        !suamiOption ||
+        !istriOption ||
+        !suamiRadio ||
+        !istriRadio
+    ) {
+        return;
+    }
+
+    if (deceasedType !== 'elder') {
+        suamiOption.style.display = 'flex';
+        istriOption.style.display = 'flex';
+        toggleLabel.innerText = 'Tampilkan Suami / Istri';
+        return;
+    }
+
+    if (!gender) {
+        suamiOption.style.display = 'flex';
+        istriOption.style.display = 'flex';
+        toggleLabel.innerText = 'Tampilkan Suami / Istri';
+        return;
+    }
+
+    if (gender.value === 'laki') {
+        suamiOption.style.display = 'none';
+        istriOption.style.display = 'flex';
+        istriRadio.checked = true;
+        suamiRadio.checked = false;
+        toggleLabel.innerText = 'Tampilkan Istri';
+    } else {
+        suamiOption.style.display = 'flex';
+        istriOption.style.display = 'none';
+        suamiRadio.checked = true;
+        istriRadio.checked = false;
+        toggleLabel.innerText = 'Tampilkan Suami';
+    }
+}
+
+function applyDeceasedTypeLayout(resetChecks) {
+    const spouseBox = document.getElementById('family-spouse');
+    const parentsBox = document.getElementById('family-parents');
+    const childrenBox = document.getElementById('family-children');
+    const siblingsBox = document.getElementById('family-siblings');
+    const grandchildrenBox = document.getElementById('family-grandchildren');
+
+    const checkSpouse = document.getElementById('check-pasangan');
+    const checkParents = document.getElementById('check-orang-tua');
+    const checkChildren = document.getElementById('check-anak');
+    const checkSiblings = document.getElementById('check-saudara');
+    const checkGrandchildren = document.getElementById('check-cucu');
+
+    if (
+        !spouseBox ||
+        !parentsBox ||
+        !childrenBox ||
+        !siblingsBox ||
+        !grandchildrenBox
+    ) {
+        return;
+    }
+
+    const isChild = deceasedType === 'child';
+
+    if (isChild) {
+        spouseBox.style.display = 'none';
+        parentsBox.style.display = 'block';
+        childrenBox.style.display = 'none';
+        siblingsBox.style.display = 'block';
+        grandchildrenBox.style.display = 'none';
+
+        if (resetChecks) {
+            checkSpouse.checked = false;
+            checkParents.checked = true;
+            checkChildren.checked = false;
+            checkSiblings.checked = true;
+            checkGrandchildren.checked = false;
+        }
+    } else {
+        spouseBox.style.display = 'block';
+        parentsBox.style.display = 'none';
+        childrenBox.style.display = 'block';
+        siblingsBox.style.display = 'none';
+        grandchildrenBox.style.display = 'block';
+
+        if (resetChecks) {
+            checkSpouse.checked = true;
+            checkParents.checked = false;
+            checkChildren.checked = true;
+            checkSiblings.checked = false;
+            checkGrandchildren.checked = true;
+        }
+
+        updateSpouseOptionsByGender();
+    }
 }
 
 function toggleLanguage() {
@@ -2452,7 +2713,9 @@ function applyDictionary() {
     document.getElementById('lbl-makam-5').innerText = d.bm5;
     document.getElementById('txt-closing1').innerText = d.c1;
     document.getElementById('txt-condolence').innerText = d.cd;
+    document.getElementById('lbl-orang-tua').innerText = d.orangTua;
     document.getElementById('lbl-anak').innerText = d.anak;
+    document.getElementById('lbl-saudara').innerText = d.saudara;
     document.getElementById('lbl-cucu').innerText = d.cucu;
 }
 
@@ -2669,6 +2932,66 @@ function renderChildrenInputs() {
     });
 }
 
+function renderSiblingInputs() {
+    const container = document.getElementById('siblings-list');
+    container.innerHTML = '';
+
+    siblingsData.forEach(function(sibling,index) {
+        const row = document.createElement('div');
+        row.className = 'child-row';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = sibling;
+        input.placeholder = 'Contoh: Saudara';
+
+        input.addEventListener('input',function() {
+            siblingsData[index] = this.value;
+            updatePreview();
+        });
+
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.className = 'child-btn child-add';
+        addButton.innerHTML = '+';
+        addButton.title = 'Tambah saudara';
+
+        addButton.onclick = function() {
+            siblingsData.splice(index + 1,0,'');
+            renderSiblingInputs();
+            updatePreview();
+
+            const inputs = document.querySelectorAll('#siblings-list input');
+
+            if (inputs[index + 1]) {
+                inputs[index + 1].focus();
+            }
+        };
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'child-btn child-remove';
+        removeButton.innerHTML = '×';
+        removeButton.title = 'Hapus saudara';
+
+        removeButton.onclick = function() {
+            if (siblingsData.length === 1) {
+                siblingsData[0] = '';
+            } else {
+                siblingsData.splice(index,1);
+            }
+
+            renderSiblingInputs();
+            updatePreview();
+        };
+
+        row.appendChild(input);
+        row.appendChild(addButton);
+        row.appendChild(removeButton);
+        container.appendChild(row);
+    });
+}
+
 function renderGrandchildrenInputs() {
     const container = document.getElementById('grandchildren-list');
     container.innerHTML = '';
@@ -2694,6 +3017,21 @@ function getChildrenText() {
     return childrenData
         .map(function(child,index) {
             const name = child.trim();
+
+            if (!name) return '';
+
+            return (index + 1) + '. ' + name;
+        })
+        .filter(function(item) {
+            return item !== '';
+        })
+        .join('\n');
+}
+
+function getSiblingsText() {
+    return siblingsData
+        .map(function(sibling,index) {
+            const name = sibling.trim();
 
             if (!name) return '';
 
@@ -2812,6 +3150,39 @@ function isStepValid(step) {
     }
 
     if (step === 4) {
+        if (deceasedType === 'child') {
+            const orangTuaAktif =
+                document.getElementById('check-orang-tua').checked;
+
+            const saudaraAktif =
+                document.getElementById('check-saudara').checked;
+
+            const orangTuaTerisi =
+                document.getElementById('in-orang-tua').value.trim() !== '';
+
+            const saudaraTerisi =
+                siblingsData.some(function(sibling) {
+                    return sibling.trim() !== '';
+                });
+
+            if (orangTuaAktif && !orangTuaTerisi) {
+                return false;
+            }
+
+            if (saudaraAktif && !saudaraTerisi) {
+                return false;
+            }
+
+            if (orangTuaAktif && orangTuaTerisi) return true;
+            if (saudaraAktif && saudaraTerisi) return true;
+
+            if (!orangTuaAktif && !saudaraAktif) {
+                return true;
+            }
+
+            return false;
+        }
+
         const pasanganAktif =
             document.getElementById('check-pasangan').checked;
 
@@ -2843,7 +3214,13 @@ function isStepValid(step) {
         if (anakAktif && anakTerisi) return true;
         if (cucuAktif && cucuTerisi) return true;
 
-        if (!pasanganAktif && !anakAktif && !cucuAktif) return true;
+        if (
+            !pasanganAktif &&
+            !anakAktif &&
+            !cucuAktif
+        ) {
+            return true;
+        }
 
         return false;
     }
@@ -2903,21 +3280,45 @@ function showValidationNotification(step) {
     }
 
     if (step === 4) {
-        const pasanganAktif =
-            document.getElementById('check-pasangan').checked;
+        if (deceasedType === 'child') {
+            const orangTuaAktif =
+                document.getElementById('check-orang-tua').checked;
 
-        const pasanganDipilih =
-            document.querySelector('input[name="pasangan"]:checked');
+            const orangTuaTerisi =
+                document.getElementById('in-orang-tua').value.trim() !== '';
 
-        const pasanganTerisi =
-            document.getElementById('in-pasangan').value.trim() !== '';
+            const saudaraAktif =
+                document.getElementById('check-saudara').checked;
 
-        if (pasanganAktif && !pasanganDipilih) {
-            message = 'Silakan pilih Suami atau Istri terlebih dahulu.';
-        } else if (pasanganAktif && !pasanganTerisi) {
-            message = 'Silakan masukkan nama Suami atau Istri terlebih dahulu.';
+            const saudaraTerisi =
+                siblingsData.some(function(sibling) {
+                    return sibling.trim() !== '';
+                });
+
+            if (orangTuaAktif && !orangTuaTerisi) {
+                message = 'Silakan masukkan data Orang Tua terlebih dahulu.';
+            } else if (saudaraAktif && !saudaraTerisi) {
+                message = 'Silakan masukkan minimal satu Saudara kandung terlebih dahulu.';
+            } else {
+                message = 'Silakan masukkan minimal satu data keluarga yang ditampilkan terlebih dahulu.';
+            }
         } else {
-            message = 'Silakan masukkan minimal satu data keluarga yang ditampilkan terlebih dahulu.';
+            const pasanganAktif =
+                document.getElementById('check-pasangan').checked;
+
+            const pasanganDipilih =
+                document.querySelector('input[name="pasangan"]:checked');
+
+            const pasanganTerisi =
+                document.getElementById('in-pasangan').value.trim() !== '';
+
+            if (pasanganAktif && !pasanganDipilih) {
+                message = 'Silakan pilih Suami atau Istri terlebih dahulu.';
+            } else if (pasanganAktif && !pasanganTerisi) {
+                message = 'Silakan masukkan nama Suami atau Istri terlebih dahulu.';
+            } else {
+                message = 'Silakan masukkan minimal satu data keluarga yang ditampilkan terlebih dahulu.';
+            }
         }
     }
 
@@ -3053,7 +3454,10 @@ function buildFinishSummary() {
     html += '<div class="summary-section">';
     html += '<div class="summary-title">Keluarga</div>';
 
-    if (document.getElementById('check-pasangan').checked) {
+    if (
+        deceasedType !== 'child' &&
+        document.getElementById('check-pasangan').checked
+    ) {
         const spouseType = spouse
             ? spouse.value === 'suami'
                 ? 'Suami'
@@ -3066,7 +3470,24 @@ function buildFinishSummary() {
         );
     }
 
-    if (document.getElementById('check-anak').checked) {
+    if (
+        deceasedType === 'child' &&
+        document.getElementById('check-orang-tua').checked
+    ) {
+        const orangTua = getSummaryValue('in-orang-tua','');
+
+        if (orangTua) {
+            html += buildSummaryItem(
+                'Orang Tua',
+                orangTua
+            );
+        }
+    }
+
+    if (
+        deceasedType !== 'child' &&
+        document.getElementById('check-anak').checked
+    ) {
         const anak = getChildrenText();
 
         if (anak) {
@@ -3078,7 +3499,25 @@ function buildFinishSummary() {
         }
     }
 
-    if (document.getElementById('check-cucu').checked) {
+    if (
+        deceasedType === 'child' &&
+        document.getElementById('check-saudara').checked
+    ) {
+        const saudara = getSiblingsText();
+
+        if (saudara) {
+            html += buildSummaryItem(
+                'Saudara Kandung',
+                saudara,
+                true
+            );
+        }
+    }
+
+    if (
+        deceasedType !== 'child' &&
+        document.getElementById('check-cucu').checked
+    ) {
         const cucu = getGrandchildrenText();
 
         if (cucu) {
@@ -3162,6 +3601,10 @@ function updatePreview() {
     const causeText = getCauseText();
     const d = dict[currentLang];
 
+    if (deceasedType) {
+        applyDeceasedTypeLayout(false);
+    }
+
     document.getElementById('out-354').style.display =
         document.getElementById('check-354').checked
             ? 'block'
@@ -3211,19 +3654,36 @@ function updatePreview() {
     );
 
     const pasanganAktif =
+        deceasedType !== 'child' &&
         document.getElementById('check-pasangan').checked;
 
+    const orangTuaAktif =
+        deceasedType === 'child' &&
+        document.getElementById('check-orang-tua').checked;
+
     const anakAktif =
+        deceasedType !== 'child' &&
         document.getElementById('check-anak').checked;
 
+    const saudaraAktif =
+        deceasedType === 'child' &&
+        document.getElementById('check-saudara').checked;
+
     const cucuAktif =
+        deceasedType !== 'child' &&
         document.getElementById('check-cucu').checked;
 
     document.getElementById('sec-pasangan').style.display =
         pasanganAktif ? 'block' : 'none';
 
+    document.getElementById('sec-orang-tua').style.display =
+        orangTuaAktif ? 'block' : 'none';
+
     document.getElementById('sec-anak').style.display =
         anakAktif ? 'block' : 'none';
+
+    document.getElementById('sec-saudara').style.display =
+        saudaraAktif ? 'block' : 'none';
 
     document.getElementById('sec-cucu').style.display =
         cucuAktif ? 'block' : 'none';
@@ -3231,6 +3691,11 @@ function updatePreview() {
     setPreviewText(
         'out-pasangan',
         getInputValue('in-pasangan',defaultData.pasangan)
+    );
+
+    setPreviewText(
+        'out-orang-tua',
+        getInputValue('in-orang-tua','')
     );
 
     const selectedSpouse =
@@ -3248,6 +3713,9 @@ function updatePreview() {
 
     document.getElementById('out-anak').innerHTML =
         exampleHTML(getChildrenText());
+
+    document.getElementById('out-saudara').innerHTML =
+        exampleHTML(getSiblingsText());
 
     document.getElementById('out-cucu').innerHTML =
         exampleHTML(getGrandchildrenText());
@@ -3302,8 +3770,12 @@ function getPreviewFontElements() {
         ['txt-condolence',19],
         ['lbl-pasangan',18],
         ['out-pasangan',18],
+        ['lbl-orang-tua',18],
+        ['out-orang-tua',18],
         ['lbl-anak',18],
         ['out-anak',18],
+        ['lbl-saudara',18],
+        ['out-saudara',18],
         ['lbl-cucu',18],
         ['out-cucu',18]
     ];
@@ -3405,10 +3877,22 @@ function setPreviewFontScale(scale) {
     document.getElementById('out-pasangan').style.lineHeight =
         Math.max(1.08,1.28 * scale);
 
+    document.getElementById('lbl-orang-tua').style.lineHeight =
+        Math.max(1.08,1.25 * scale);
+
+    document.getElementById('out-orang-tua').style.lineHeight =
+        Math.max(1.08,1.28 * scale);
+
     document.getElementById('lbl-anak').style.lineHeight =
         Math.max(1.08,1.25 * scale);
 
     document.getElementById('out-anak').style.lineHeight =
+        Math.max(1.08,1.28 * scale);
+
+    document.getElementById('lbl-saudara').style.lineHeight =
+        Math.max(1.08,1.25 * scale);
+
+    document.getElementById('out-saudara').style.lineHeight =
         Math.max(1.08,1.28 * scale);
 
     document.getElementById('lbl-cucu').style.lineHeight =
@@ -3640,12 +4124,14 @@ window.addEventListener(
         await preloadFrameImage();
 
         renderChildrenInputs();
+        renderSiblingInputs();
         renderGrandchildrenInputs();
         applyDictionary();
         updatePreview();
         scalePreview();
         showStep(1);
         update354Button();
+        startDownloadAttention();
 
         await waitForPreviewReady();
         scalePreview();
@@ -3793,12 +4279,19 @@ async function createExportCanvas() {
     exportPaper.style.overflow = 'hidden';
     exportPaper.style.boxSizing = 'border-box';
     exportPaper.style.backgroundColor = '#ffffff';
+    exportPaper.style.color = '#000000';
     exportPaper.style.backgroundImage = frameDataURL
         ? 'url("' + frameDataURL + '")'
         : 'url("' + FRAME_URL + '")';
     exportPaper.style.backgroundSize = '100% 100%';
     exportPaper.style.backgroundPosition = 'center';
     exportPaper.style.backgroundRepeat = 'no-repeat';
+
+    exportPaper.querySelectorAll('*').forEach(function(element) {
+        if (!element.classList.contains('example-text')) {
+            element.style.color = '#000000';
+        }
+    });
 
     const exportContentArea =
         exportPaper.querySelector('#content-area');
@@ -3877,8 +4370,17 @@ async function createExportCanvas() {
     const exportSpouse =
         exportPaper.querySelector('#sec-pasangan');
 
+    const exportParents =
+        exportPaper.querySelector('#sec-orang-tua');
+
     const exportChildrenSection =
         exportPaper.querySelector('#sec-anak');
+
+    const exportSiblingsSection =
+        exportPaper.querySelector('#sec-saudara');
+
+    const exportGrandchildrenSection =
+        exportPaper.querySelector('#sec-cucu');
 
     if (exportFamily) {
         exportFamily.style.gap = '0';
@@ -3892,8 +4394,20 @@ async function createExportCanvas() {
         exportSpouse.style.marginBottom = '0';
     }
 
+    if (exportParents) {
+        exportParents.style.marginBottom = '0';
+    }
+
     if (exportChildrenSection) {
         exportChildrenSection.style.marginBottom = '0';
+    }
+
+    if (exportSiblingsSection) {
+        exportSiblingsSection.style.marginBottom = '0';
+    }
+
+    if (exportGrandchildrenSection) {
+        exportGrandchildrenSection.style.marginBottom = '0';
     }
 
     const exportChildren =
@@ -3921,6 +4435,7 @@ async function createExportCanvas() {
             childLine.style.display = 'block';
             childLine.style.width = '100%';
             childLine.style.whiteSpace = 'nowrap';
+            childLine.style.color = '#000000';
             childLine.textContent = line;
 
             exportChildren.appendChild(childLine);
@@ -3934,6 +4449,49 @@ async function createExportCanvas() {
         exportChildren.style.width = '100%';
         exportChildren.style.whiteSpace = 'normal';
         exportChildren.style.textAlign = 'left';
+        exportChildren.style.color = '#000000';
+    }
+
+    const exportSiblings =
+        exportPaper.querySelector('#out-saudara');
+
+    if (exportSiblings) {
+        const siblingsText =
+            exportSiblings.textContent || '';
+
+        const siblingsLines =
+            siblingsText
+                .split(/\r?\n/)
+                .map(function(line) {
+                    return line.trim();
+                })
+                .filter(function(line) {
+                    return line !== '';
+                });
+
+        exportSiblings.innerHTML = '';
+
+        siblingsLines.forEach(function(line,index) {
+            const siblingLine = document.createElement('div');
+
+            siblingLine.style.display = 'block';
+            siblingLine.style.width = '100%';
+            siblingLine.style.whiteSpace = 'nowrap';
+            siblingLine.style.color = '#000000';
+            siblingLine.textContent = line;
+
+            exportSiblings.appendChild(siblingLine);
+
+            if (index < siblingsLines.length - 1) {
+                siblingLine.style.marginBottom = '0';
+            }
+        });
+
+        exportSiblings.style.display = 'block';
+        exportSiblings.style.width = '100%';
+        exportSiblings.style.whiteSpace = 'normal';
+        exportSiblings.style.textAlign = 'left';
+        exportSiblings.style.color = '#000000';
     }
 
     exportStage.appendChild(exportPaper);
@@ -4011,6 +4569,13 @@ async function createExportCanvas() {
                 clonedPaper.style.overflow = 'hidden';
                 clonedPaper.style.boxSizing = 'border-box';
                 clonedPaper.style.backgroundColor = '#ffffff';
+                clonedPaper.style.color = '#000000';
+
+                clonedPaper.querySelectorAll('*').forEach(function(element) {
+                    if (!element.classList.contains('example-text')) {
+                        element.style.color = '#000000';
+                    }
+                });
 
                 if (frameDataURL) {
                     clonedPaper.style.backgroundImage =
@@ -4039,17 +4604,20 @@ async function createExportCanvas() {
                     clonedContent.style.minHeight = '0';
                     clonedContent.style.paddingBottom = '36px';
                     clonedContent.style.overflow = 'visible';
+                    clonedContent.style.color = '#000000';
                 }
 
                 if (clonedDynWrapper) {
                     clonedDynWrapper.style.overflow = 'visible';
                     clonedDynWrapper.style.minHeight = '0';
+                    clonedDynWrapper.style.color = '#000000';
                 }
 
                 if (clonedDynContent) {
                     clonedDynContent.style.overflow = 'visible';
                     clonedDynContent.style.maxHeight = 'none';
                     clonedDynContent.style.transformOrigin = 'center top';
+                    clonedDynContent.style.color = '#000000';
                 }
 
                 const clonedAgeSection =
@@ -4058,6 +4626,7 @@ async function createExportCanvas() {
                 if (clonedAgeSection) {
                     clonedAgeSection.style.fontWeight = '800';
                     clonedAgeSection.style.fontStyle = 'normal';
+                    clonedAgeSection.style.color = '#000000';
                 }
 
                 const clonedAgePrefix =
@@ -4065,6 +4634,7 @@ async function createExportCanvas() {
 
                 if (clonedAgePrefix) {
                     clonedAgePrefix.style.fontWeight = '800';
+                    clonedAgePrefix.style.color = '#000000';
                 }
 
                 const clonedAgeValue =
@@ -4072,6 +4642,7 @@ async function createExportCanvas() {
 
                 if (clonedAgeValue) {
                     clonedAgeValue.style.fontWeight = '800';
+                    clonedAgeValue.style.color = '#000000';
                 }
 
                 const clonedAgeSuffix =
@@ -4079,6 +4650,7 @@ async function createExportCanvas() {
 
                 if (clonedAgeSuffix) {
                     clonedAgeSuffix.style.fontWeight = '800';
+                    clonedAgeSuffix.style.color = '#000000';
                 }
 
                 const clonedBurialTitle =
@@ -4089,6 +4661,7 @@ async function createExportCanvas() {
                     clonedBurialTitle.style.fontStyle = 'normal';
                     clonedBurialTitle.style.display = 'block';
                     clonedBurialTitle.style.fontFamily = "'Plus Jakarta Sans','Inter',sans-serif";
+                    clonedBurialTitle.style.color = '#000000';
                 }
 
                 const clonedCondolence =
@@ -4097,8 +4670,17 @@ async function createExportCanvas() {
                 const clonedSpouse =
                     clonedPaper.querySelector('[id="sec-pasangan"]');
 
+                const clonedParents =
+                    clonedPaper.querySelector('[id="sec-orang-tua"]');
+
                 const clonedChildrenSection =
                     clonedPaper.querySelector('[id="sec-anak"]');
+
+                const clonedSiblingsSection =
+                    clonedPaper.querySelector('[id="sec-saudara"]');
+
+                const clonedGrandchildrenSection =
+                    clonedPaper.querySelector('[id="sec-cucu"]');
 
                 const clonedFamily =
                     clonedPaper.querySelector('[id="sec-keluarga"]');
@@ -4115,8 +4697,20 @@ async function createExportCanvas() {
                     clonedSpouse.style.marginBottom = '0';
                 }
 
+                if (clonedParents) {
+                    clonedParents.style.marginBottom = '0';
+                }
+
                 if (clonedChildrenSection) {
                     clonedChildrenSection.style.marginBottom = '0';
+                }
+
+                if (clonedSiblingsSection) {
+                    clonedSiblingsSection.style.marginBottom = '0';
+                }
+
+                if (clonedGrandchildrenSection) {
+                    clonedGrandchildrenSection.style.marginBottom = '0';
                 }
 
                 const clonedChildren =
@@ -4127,6 +4721,7 @@ async function createExportCanvas() {
                     clonedChildren.style.width = '100%';
                     clonedChildren.style.whiteSpace = 'normal';
                     clonedChildren.style.textAlign = 'left';
+                    clonedChildren.style.color = '#000000';
 
                     const childrenLines =
                         (clonedChildren.textContent || '')
@@ -4147,9 +4742,46 @@ async function createExportCanvas() {
                         childLine.style.display = 'block';
                         childLine.style.width = '100%';
                         childLine.style.whiteSpace = 'nowrap';
+                        childLine.style.color = '#000000';
                         childLine.textContent = line;
 
                         clonedChildren.appendChild(childLine);
+                    });
+                }
+
+                const clonedSiblings =
+                    clonedPaper.querySelector('[id="out-saudara"]');
+
+                if (clonedSiblings) {
+                    clonedSiblings.style.display = 'block';
+                    clonedSiblings.style.width = '100%';
+                    clonedSiblings.style.whiteSpace = 'normal';
+                    clonedSiblings.style.textAlign = 'left';
+                    clonedSiblings.style.color = '#000000';
+
+                    const siblingsLines =
+                        (clonedSiblings.textContent || '')
+                            .split(/\r?\n/)
+                            .map(function(line) {
+                                return line.trim();
+                            })
+                            .filter(function(line) {
+                                return line !== '';
+                            });
+
+                    clonedSiblings.innerHTML = '';
+
+                    siblingsLines.forEach(function(line) {
+                        const siblingLine =
+                            clonedDocument.createElement('div');
+
+                        siblingLine.style.display = 'block';
+                        siblingLine.style.width = '100%';
+                        siblingLine.style.whiteSpace = 'nowrap';
+                        siblingLine.style.color = '#000000';
+                        siblingLine.textContent = line;
+
+                        clonedSiblings.appendChild(siblingLine);
                     });
                 }
 
